@@ -1,0 +1,1017 @@
+[
+  {
+    "text": "Any good comedy films?",
+    "entities": [
+      {
+        "start": 9,
+        "end": 15,
+        "value": "comedy",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Any classic western films?",
+    "entities": [
+      {
+        "start": 12,
+        "end": 19,
+        "value": "western",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Any great superhero films?",
+    "entities": [
+      {
+        "start": 10,
+        "end": 19,
+        "value": "superhero",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "List the actors in Pulp Fiction",
+    "entities": [
+      {
+        "start": 19,
+        "end": 31,
+        "value": "Pulp Fiction",
+        "entity": "movie_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 0,
+        "end": 4,
+        "confidence_entity": 0.9864845871925354,
+        "value": "List",
+        "extractor": "DIETClassifier"
+      },
+      {
+        "entity": "movie_title",
+        "start": 19,
+        "end": 31,
+        "confidence_entity": 0.9990074038505554,
+        "value": "Pulp Fiction",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  },
+  {
+    "text": "What are good electronic tracks?",
+    "entities": [
+      {
+        "start": 14,
+        "end": 24,
+        "value": "electronic",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "What are the best blues tracks?",
+    "entities": [
+      {
+        "start": 18,
+        "end": 23,
+        "value": "blues",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Who is The Weeknd?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 17,
+        "value": "The Weeknd",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 7,
+        "end": 17,
+        "confidence_entity": 0.5208004713058472,
+        "value": "The Weeknd",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What do you know about Coldplay?",
+    "entities": [
+      {
+        "start": 23,
+        "end": 31,
+        "value": "Coldplay",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 23,
+        "end": 31,
+        "confidence_entity": 0.46629029512405396,
+        "value": "Coldplay",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Give me info on Ed Sheeran",
+    "entities": [
+      {
+        "start": 16,
+        "end": 26,
+        "value": "Ed Sheeran",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 16,
+        "end": 26,
+        "confidence_entity": 0.3950119912624359,
+        "value": "Ed Sheeran",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What do you know about Pink Floyd?",
+    "entities": [
+      {
+        "start": 23,
+        "end": 33,
+        "value": "Pink Floyd",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 23,
+        "end": 33,
+        "confidence_entity": 0.5698381066322327,
+        "value": "Pink Floyd",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What's Shape of You about?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 19,
+        "value": "Shape of You",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Describe Hotel California",
+    "entities": [
+      {
+        "start": 9,
+        "end": 25,
+        "value": "Hotel California",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "artist_name",
+        "start": 15,
+        "end": 25,
+        "confidence_entity": 0.5423018932342529,
+        "value": "California",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Find me a crime film",
+    "entities": [
+      {
+        "start": 10,
+        "end": 15,
+        "value": "crime",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I want something funny to watch",
+    "entities": [
+      {
+        "start": 17,
+        "end": 22,
+        "value": "funny",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Show me good indie films",
+    "entities": [
+      {
+        "start": 13,
+        "end": 18,
+        "value": "indie",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I want to listen to some pop music",
+    "entities": [
+      {
+        "start": 25,
+        "end": 28,
+        "value": "pop",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Recommend a rock song",
+    "entities": [
+      {
+        "start": 12,
+        "end": 16,
+        "value": "rock",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I love indie music, any suggestions?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 12,
+        "value": "indie",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Tell me about Doja Cat",
+    "entities": [
+      {
+        "start": 14,
+        "end": 22,
+        "value": "Doja Cat",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 14,
+        "end": 22,
+        "confidence_entity": 0.3302854597568512,
+        "value": "Doja Cat",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Tell me about Adele",
+    "entities": [
+      {
+        "start": 14,
+        "end": 19,
+        "value": "Adele",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 14,
+        "end": 19,
+        "confidence_entity": 0.7566018104553223,
+        "value": "Adele",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Who is Bad Bunny?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 16,
+        "value": "Bad Bunny",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 7,
+        "end": 16,
+        "confidence_entity": 0.2851869761943817,
+        "value": "Bad Bunny",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Give me details about Smells Like Teen Spirit",
+    "entities": [
+      {
+        "start": 22,
+        "end": 45,
+        "value": "Smells Like Teen Spirit",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 22,
+        "end": 33,
+        "confidence_entity": 0.43407878279685974,
+        "value": "Smells Like",
+        "extractor": "DIETClassifier"
+      },
+      {
+        "entity": "movie_title",
+        "start": 34,
+        "end": 45,
+        "confidence_entity": 0.4013301432132721,
+        "value": "Teen Spirit",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Describe the song Watermelon Sugar",
+    "entities": [
+      {
+        "start": 18,
+        "end": 34,
+        "value": "Watermelon Sugar",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Tell me about Levitating",
+    "entities": [
+      {
+        "start": 14,
+        "end": 24,
+        "value": "Levitating",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "What are good documentary movies?",
+    "entities": [
+      {
+        "start": 14,
+        "end": 25,
+        "value": "documentary",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Give me a mystery recommendation",
+    "entities": [
+      {
+        "start": 10,
+        "end": 17,
+        "value": "mystery",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "What are the best fantasy movies?",
+    "entities": [
+      {
+        "start": 18,
+        "end": 25,
+        "value": "fantasy",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I want to know about Titanic",
+    "entities": [
+      {
+        "start": 21,
+        "end": 28,
+        "value": "Titanic",
+        "entity": "movie_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "genre",
+        "start": 21,
+        "end": 28,
+        "confidence_entity": 0.7401082515716553,
+        "value": "Titanic",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Find me some metal songs",
+    "entities": [
+      {
+        "start": 13,
+        "end": 18,
+        "value": "metal",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I want something chill to listen to",
+    "entities": [
+      {
+        "start": 17,
+        "end": 22,
+        "value": "chill",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Recommend some lo-fi music",
+    "entities": [
+      {
+        "start": 15,
+        "end": 20,
+        "value": "lo-fi",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Any good acoustic songs?",
+    "entities": [
+      {
+        "start": 9,
+        "end": 17,
+        "value": "acoustic",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Who are BTS?",
+    "entities": [
+      {
+        "start": 8,
+        "end": 11,
+        "value": "BTS",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "What's the background of Eminem?",
+    "entities": [
+      {
+        "start": 25,
+        "end": 31,
+        "value": "Eminem",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 25,
+        "end": 31,
+        "confidence_entity": 0.3955386281013489,
+        "value": "Eminem",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Give me facts about Beyoncé",
+    "entities": [
+      {
+        "start": 20,
+        "end": 27,
+        "value": "Beyoncé",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 20,
+        "end": 27,
+        "confidence_entity": 0.2132369726896286,
+        "value": "Beyoncé",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What's the meaning of Imagine?",
+    "entities": [
+      {
+        "start": 22,
+        "end": 29,
+        "value": "Imagine",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 22,
+        "end": 29,
+        "confidence_entity": 0.6903736591339111,
+        "value": "Imagine",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Tell me about bad guy",
+    "entities": [
+      {
+        "start": 14,
+        "end": 21,
+        "value": "bad guy",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "What's trending on Spotify?",
+    "entities": [],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 19,
+        "end": 26,
+        "confidence_entity": 0.4785377085208893,
+        "value": "Spotify",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "I'm in the mood for action",
+    "entities": [
+      {
+        "start": 20,
+        "end": 26,
+        "value": "action",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 20,
+        "end": 26,
+        "confidence_entity": 0.5114471316337585,
+        "value": "action",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Show me some sci-fi films",
+    "entities": [
+      {
+        "start": 13,
+        "end": 19,
+        "value": "sci-fi",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I feel like country music today",
+    "entities": [
+      {
+        "start": 12,
+        "end": 19,
+        "value": "country",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 12,
+        "end": 19,
+        "confidence_entity": 0.9831825494766235,
+        "value": "country",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Give me a reggae recommendation",
+    "entities": [
+      {
+        "start": 10,
+        "end": 16,
+        "value": "reggae",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I'm feeling sad music right now",
+    "entities": [
+      {
+        "start": 12,
+        "end": 15,
+        "value": "sad",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Tell me about Taylor Swift",
+    "entities": [
+      {
+        "start": 14,
+        "end": 26,
+        "value": "Taylor Swift",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 14,
+        "end": 26,
+        "confidence_entity": 0.59,
+        "value": "Taylor Swift",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Who is Harry Styles?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 19,
+        "value": "Harry Styles",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 7,
+        "end": 19,
+        "confidence_entity": 0.51,
+        "value": "Harry Styles",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Tell me about the song Bohemian Rhapsody",
+    "entities": [
+      {
+        "start": 23,
+        "end": 40,
+        "value": "Bohemian Rhapsody",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "artist_name",
+        "start": 23,
+        "end": 40,
+        "confidence_entity": 0.3963472843170166,
+        "value": "Bohemian Rhapsody",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What is God's Plan about?",
+    "entities": [
+      {
+        "start": 8,
+        "end": 18,
+        "value": "God's Plan",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Give me info on Stay With Me",
+    "entities": [
+      {
+        "start": 16,
+        "end": 28,
+        "value": "Stay With Me",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 26,
+        "end": 28,
+        "confidence_entity": 0.7818990349769592,
+        "value": "Me",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Recommend a drama movie",
+    "entities": [
+      {
+        "start": 12,
+        "end": 17,
+        "value": "drama",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "I love animation movies, any suggestions?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 16,
+        "value": "animation",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "What's the deal with No Country for Old Men?",
+    "entities": [
+      {
+        "start": 21,
+        "end": 43,
+        "value": "No Country for Old Men",
+        "entity": "movie_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 16,
+        "end": 20,
+        "confidence_entity": 0.7362207770347595,
+        "value": "with",
+        "extractor": "DIETClassifier"
+      },
+      {
+        "entity": "movie_title",
+        "start": 21,
+        "end": 43,
+        "confidence_entity": 0.983177125453949,
+        "value": "No Country for Old Men",
+        "extractor": "DIETClassifier",
+        "processors": [
+          "EntitySynonymMapper"
+        ]
+      }
+    ]
+  },
+  {
+    "text": "Any good jazz tracks?",
+    "entities": [
+      {
+        "start": 9,
+        "end": 13,
+        "value": "jazz",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Show me R&B songs",
+    "entities": [
+      {
+        "start": 8,
+        "end": 11,
+        "value": "R&B",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Any great folk artists?",
+    "entities": [
+      {
+        "start": 10,
+        "end": 14,
+        "value": "folk",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Give me some workout music",
+    "entities": [
+      {
+        "start": 13,
+        "end": 20,
+        "value": "workout",
+        "entity": "genre"
+      }
+    ],
+    "predicted_entities": []
+  },
+  {
+    "text": "Tell me about the band Radiohead",
+    "entities": [
+      {
+        "start": 23,
+        "end": 32,
+        "value": "Radiohead",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "song_title",
+        "start": 18,
+        "end": 22,
+        "confidence_entity": 0.734494686126709,
+        "value": "band",
+        "extractor": "DIETClassifier"
+      },
+      {
+        "entity": "song_title",
+        "start": 23,
+        "end": 32,
+        "confidence_entity": 0.38658273220062256,
+        "value": "Radiohead",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "Who is Kendrick Lamar?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 21,
+        "value": "Kendrick Lamar",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 7,
+        "end": 21,
+        "confidence_entity": 0.4604783058166504,
+        "value": "Kendrick Lamar",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What's Billie Eilish's story?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 20,
+        "value": "Billie Eilish",
+        "entity": "artist_name"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 7,
+        "end": 13,
+        "confidence_entity": 0.4742428660392761,
+        "value": "Billie",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What is Blinding Lights about?",
+    "entities": [
+      {
+        "start": 8,
+        "end": 23,
+        "value": "Blinding Lights",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "genre",
+        "start": 8,
+        "end": 16,
+        "confidence_entity": 0.6371784210205078,
+        "value": "Blinding",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What is Rolling in the Deep about?",
+    "entities": [
+      {
+        "start": 8,
+        "end": 27,
+        "value": "Rolling in the Deep",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "movie_title",
+        "start": 19,
+        "end": 22,
+        "confidence_entity": 0.8067071437835693,
+        "value": "the",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  },
+  {
+    "text": "What's Anti-Hero about?",
+    "entities": [
+      {
+        "start": 7,
+        "end": 16,
+        "value": "Anti-Hero",
+        "entity": "song_title"
+      }
+    ],
+    "predicted_entities": [
+      {
+        "entity": "genre",
+        "start": 7,
+        "end": 16,
+        "confidence_entity": 0.9955534338951111,
+        "value": "Anti-Hero",
+        "extractor": "DIETClassifier"
+      }
+    ]
+  }
+]

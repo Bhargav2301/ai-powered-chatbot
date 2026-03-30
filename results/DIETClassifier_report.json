@@ -1,0 +1,58 @@
+{
+  "movie_title": {
+    "precision": 0.7835051546391752,
+    "recall": 0.987012987012987,
+    "f1-score": 0.8735632183908045,
+    "support": 77,
+    "confused_with": {
+      "genre": 1
+    }
+  },
+  "song_title": {
+    "precision": 0.3684210526315789,
+    "recall": 0.2,
+    "f1-score": 0.25925925925925924,
+    "support": 35,
+    "confused_with": {
+      "movie_title": 5
+    }
+  },
+  "genre": {
+    "precision": 0.7,
+    "recall": 0.19444444444444445,
+    "f1-score": 0.30434782608695654,
+    "support": 36,
+    "confused_with": {
+      "movie_title": 2
+    }
+  },
+  "artist_name": {
+    "precision": 0.25,
+    "recall": 0.04,
+    "f1-score": 0.06896551724137932,
+    "support": 25,
+    "confused_with": {
+      "movie_title": 13,
+      "song_title": 9
+    }
+  },
+  "micro avg": {
+    "precision": 0.7,
+    "recall": 0.5260115606936416,
+    "f1-score": 0.6006600660066007,
+    "support": 173
+  },
+  "macro avg": {
+    "precision": 0.5254815518176885,
+    "recall": 0.3553643578643579,
+    "f1-score": 0.37653395524459987,
+    "support": 173
+  },
+  "weighted avg": {
+    "precision": 0.6050556864122645,
+    "recall": 0.5260115606936416,
+    "f1-score": 0.5145612806955545,
+    "support": 173
+  },
+  "accuracy": 0.90304396843292
+}
