@@ -1,0 +1,134 @@
+# ============================================================
+# data/stories/music_stories.yml — Music Conversation Flows
+# ============================================================
+# Mirrors the structure of movies_stories.yml but for music.
+# The same context-awareness principles apply:
+#   - current_artist slot remembers the last discussed artist
+#   - preferred_genre slot remembers the user's music taste
+#   - Follow-up questions resolve "it"/"them"/"their music"
+#     by reading these slots instead of requiring repetition
+# ============================================================
+
+version: "3.1"
+
+stories:
+
+# ── Story 1: Simple Song Recommendation ───────────────────────
+- story: user asks for a song recommendation
+  steps:
+  - intent: ask_song_recommendation
+  - action: action_recommend_song
+
+# ── Story 2: Genre-Based Music Recommendation ─────────────────
+- story: user asks for music by genre
+  steps:
+  - intent: ask_song_by_genre
+  - action: action_recommend_song
+
+# ── Story 3: Artist Info Lookup ───────────────────────────────
+- story: user asks about an artist directly
+  steps:
+  - intent: ask_artist_info
+  - action: action_get_artist_info
+
+# ── Story 4: Song Details Lookup ──────────────────────────────
+- story: user asks about a song directly
+  steps:
+  - intent: ask_song_details
+  - action: action_get_song_details
+
+# ── Story 5: Top Songs ────────────────────────────────────────
+- story: user asks for top songs
+  steps:
+  - intent: ask_top_songs
+  - action: action_get_top_songs
+
+# ── Story 6: Recommendation → Artist Info (CONTEXT) ──────────
+# User gets song recommendations, then asks about the artist.
+# current_artist slot carries the context.
+- story: song recommendation then ask about artist
+  steps:
+  - intent: ask_song_recommendation
+  - action: action_recommend_song
+  - intent: ask_artist_info          # "Tell me about them"
+  - action: action_get_artist_info   # Uses current_artist slot
+
+# ── Story 7: Genre Recommendation → Artist Info ───────────────
+- story: genre music recommendation then artist info
+  steps:
+  - intent: ask_song_by_genre
+  - action: action_recommend_song
+  - intent: ask_artist_info          # "Who's that artist?"
+  - action: action_get_artist_info
+
+# ── Story 8: Artist Info → Song Details (CONTEXT CHAIN) ───────
+# User learns about artist, then asks about their specific song.
+- story: artist info then song details
+  steps:
+  - intent: ask_artist_info
+  - action: action_get_artist_info
+  - intent: ask_song_details         # "What's that song about?"
+  - action: action_get_song_details
+
+# ── Story 9: Top Songs → Song Details ─────────────────────────
+# User sees top songs, then asks about one of them.
+- story: top songs then ask song details
+  steps:
+  - intent: ask_top_songs
+  - action: action_get_top_songs
+  - intent: ask_song_details         # "Tell me about the first one"
+  - action: action_get_song_details
+
+# ── Story 10: Full 3-Turn Music Context Chain ─────────────────
+# Genre → Recommendation → Artist Info → Song Details
+- story: genre to recommendation to artist to song
+  steps:
+  - intent: ask_song_by_genre
+  - action: action_recommend_song
+  - intent: ask_artist_info
+  - action: action_get_artist_info
+  - intent: ask_song_details         # "What's their most famous song about?"
+  - action: action_get_song_details
+
+# ── Story 11: Recommendation → Affirm → More Info ─────────────
+- story: song recommendation with affirmation
+  steps:
+  - intent: ask_song_recommendation
+  - action: action_recommend_song
+  - intent: affirm                   # "Yes, tell me more!"
+  - action: action_get_song_details
+
+# ── Story 12: Recommendation → Deny → New Genre ───────────────
+# User rejects recommendation and tries a different genre.
+- story: song recommendation rejected then new genre
+  steps:
+  - intent: ask_song_recommendation
+  - action: action_recommend_song
+  - intent: deny                     # "Not really my style"
+  - action: utter_ask_for_genre_music
+  - intent: ask_song_by_genre
+  - action: action_recommend_song
+
+# ── Story 13: Artist Info → More Songs ────────────────────────
+- story: artist info then ask for their songs
+  steps:
+  - intent: ask_artist_info
+  - action: action_get_artist_info
+  - intent: ask_song_recommendation  # "What else should I listen to?"
+  - action: action_recommend_song
+
+# ── Story 14: Top Songs → Artist Info ─────────────────────────
+- story: top songs then ask about artist
+  steps:
+  - intent: ask_top_songs
+  - action: action_get_top_songs
+  - intent: ask_artist_info          # "Who sings that?"
+  - action: action_get_artist_info
+
+# ── Story 15: Genre → Affirm → Artist Dive ────────────────────
+- story: genre recommendation affirmed then artist info
+  steps:
+  - intent: ask_song_by_genre
+  - action: action_recommend_song
+  - intent: affirm
+  - action: action_get_artist_info

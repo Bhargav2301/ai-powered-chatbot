@@ -1,0 +1,68 @@
+# ============================================================
+# data/rules/rules.yml — Deterministic Conversation Rules
+# ============================================================
+# Rules are GUARANTEED to fire when their condition is met.
+# Unlike stories, they don't depend on conversation history.
+# The RulePolicy handles these with highest priority.
+#
+# USE RULES FOR:
+#   - Greetings and goodbyes (always the same response)
+#   - Bot identity questions (always honest)
+#   - Fallback handling (always catch unknown input)
+#   - Out-of-scope responses (always redirect)
+#
+# SYNTAX:
+#   condition:  (optional) what must be true BEFORE this fires
+#   steps:      the intent → action sequence that always happens
+# ============================================================
+
+version: "3.1"
+
+rules:
+
+# ── Rule: Greet ───────────────────────────────────────────────
+# Whenever the user says hello, ALWAYS respond with utter_greet.
+# No matter where in the conversation this happens.
+- rule: Greet the user
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+# ── Rule: Goodbye ─────────────────────────────────────────────
+# Whenever the user says bye, ALWAYS respond with utter_goodbye.
+- rule: Say goodbye to the user
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+# ── Rule: Thank You ───────────────────────────────────────────
+- rule: Respond to thank you
+  steps:
+  - intent: thank_you
+  - action: utter_thank_you
+
+# ── Rule: Bot Challenge ───────────────────────────────────────
+# If the user asks "Are you a bot?", ALWAYS be honest.
+# This must be a rule (not a story) — honesty is non-negotiable.
+- rule: Respond to bot challenge
+  steps:
+  - intent: bot_challenge
+  - action: utter_bot_challenge
+
+# ── Rule: Out of Scope ────────────────────────────────────────
+# If the user asks something unrelated to music/movies,
+# ALWAYS redirect them to what the bot can do.
+- rule: Handle out of scope messages
+  steps:
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+
+# ── Rule: NLU Fallback ────────────────────────────────────────
+# When the FallbackClassifier fires (confidence < 0.4),
+# the intent becomes "nlu_fallback" — this rule catches it.
+# action_default_fallback is a built-in Rasa action that sends
+# utter_default_fallback and rewinds the tracker state.
+- rule: Handle NLU fallback
+  steps:
+  - intent: nlu_fallback
+  - action: action_default_fallback

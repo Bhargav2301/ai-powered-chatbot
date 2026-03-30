@@ -25,7 +25,7 @@
 **Requirements**: REQ-01, REQ-02
 
 ### Phase 3: Domain & Dialogue
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Mielstone Branch**: `milestone-3/domain-and-dialogue`
 **Objective**: Define slots, stories, and rules for managing dialog flow.
 **Requirements**: REQ-04, REQ-06

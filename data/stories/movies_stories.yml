@@ -1,0 +1,150 @@
+# ============================================================
+# data/stories/movies_stories.yml — Movie Conversation Flows
+# ============================================================
+# Stories teach the TEDPolicy how movie conversations can flow.
+# Each story is one EXAMPLE path — not a script the bot follows
+# word-for-word, but a pattern it learns from.
+#
+# HOW THE BOT USES STORIES:
+#   1. During training, TEDPolicy reads all stories
+#   2. It learns "after THIS sequence of intents/actions,
+#      the most likely next action is X"
+#   3. At runtime, it predicts the best next action based
+#      on what it learned from similar story paths
+#
+# CONTEXT AWARENESS comes from SLOTS:
+#   When action_recommend_movie runs, it stores the movie title
+#   in the 'current_movie' slot. Follow-up intents like
+#   ask_movie_director then read that slot to know what "it"
+#   refers to — without the user repeating the title.
+# ============================================================
+
+version: "3.1"
+
+stories:
+
+# ── Story 1: Simple Movie Recommendation ─────────────────────
+# User asks for a recommendation with no specific genre.
+# Bot responds with general recommendations.
+- story: user asks for a movie recommendation
+  steps:
+  - intent: ask_movie_recommendation
+  - action: action_recommend_movie
+
+# ── Story 2: Genre-Based Movie Recommendation ─────────────────
+# User specifies a genre. Bot filters recommendations.
+- story: user asks for a movie by genre
+  steps:
+  - intent: ask_movie_by_genre
+  - action: action_recommend_movie
+
+# ── Story 3: Movie Details Lookup ─────────────────────────────
+# User asks directly about a specific movie by name.
+- story: user asks for movie details directly
+  steps:
+  - intent: ask_movie_details
+  - action: action_get_movie_details
+
+# ── Story 4: Recommendation → Follow-up Details (CONTEXT) ────
+# This is the KEY context-aware story.
+# User gets recommendations, then asks about one of them.
+# The bot remembers which movie was discussed via current_movie slot.
+- story: movie recommendation then ask for details
+  steps:
+  - intent: ask_movie_recommendation
+  - action: action_recommend_movie
+  - intent: ask_movie_details        # "Tell me about the first one"
+  - action: action_get_movie_details # Bot uses current_movie slot
+
+# ── Story 5: Genre Recommendation → Follow-up Details ─────────
+- story: genre recommendation then ask for details
+  steps:
+  - intent: ask_movie_by_genre
+  - action: action_recommend_movie
+  - intent: ask_movie_details        # "What about that one?"
+  - action: action_get_movie_details
+
+# ── Story 6: Details → Ask Director (CONTEXT CHAIN) ──────────
+# 3-turn context chain: recommend → details → director
+# "It" in "who directed it?" resolves to the movie in the slot.
+- story: movie details then ask director
+  steps:
+  - intent: ask_movie_details
+  - action: action_get_movie_details
+  - intent: ask_movie_director       # "Who directed it?"
+  - action: action_get_movie_director
+
+# ── Story 7: Full 3-Turn Context Chain ────────────────────────
+# Recommendation → Details → Director
+# Demonstrates the full context pipeline.
+- story: recommendation to details to director
+  steps:
+  - intent: ask_movie_recommendation
+  - action: action_recommend_movie
+  - intent: ask_movie_details
+  - action: action_get_movie_details
+  - intent: ask_movie_director       # "Who made it?"
+  - action: action_get_movie_director
+
+# ── Story 8: Details → Ask Cast ───────────────────────────────
+- story: movie details then ask cast
+  steps:
+  - intent: ask_movie_details
+  - action: action_get_movie_details
+  - intent: ask_movie_cast           # "Who stars in it?"
+  - action: action_get_movie_cast
+
+# ── Story 9: Director → Cast (Same Movie Context) ─────────────
+- story: ask director then ask cast
+  steps:
+  - intent: ask_movie_director
+  - action: action_get_movie_director
+  - intent: ask_movie_cast           # "And who's in it?"
+  - action: action_get_movie_cast
+
+# ── Story 10: Now Playing ──────────────────────────────────────
+- story: user asks what movies are now playing
+  steps:
+  - intent: ask_now_playing
+  - action: action_get_now_playing
+
+# ── Story 11: Now Playing → Details ───────────────────────────
+# User sees recent movies, then asks about one.
+- story: now playing then ask for details
+  steps:
+  - intent: ask_now_playing
+  - action: action_get_now_playing
+  - intent: ask_movie_details
+  - action: action_get_movie_details
+
+# ── Story 12: Genre → Affirm → More Details ───────────────────
+# User confirms they want to know more after getting recommendations.
+- story: genre recommendation with affirmation
+  steps:
+  - intent: ask_movie_by_genre
+  - action: action_recommend_movie
+  - intent: affirm                   # "Yes, tell me more!"
+  - action: action_get_movie_details
+
+# ── Story 13: Recommendation → Deny → New Genre ───────────────
+# User rejects recommendations and tries a different genre.
+- story: recommendation rejected then new genre
+  steps:
+  - intent: ask_movie_recommendation
+  - action: action_recommend_movie
+  - intent: deny                     # "No, not those"
+  - action: utter_ask_for_genre_movies
+  - intent: ask_movie_by_genre
+  - action: action_recommend_movie
+
+# ── Story 14: Direct Cast Query ───────────────────────────────
+- story: user asks about cast directly
+  steps:
+  - intent: ask_movie_cast
+  - action: action_get_movie_cast
+
+# ── Story 15: Direct Director Query ───────────────────────────
+- story: user asks about director directly
+  steps:
+  - intent: ask_movie_director
+  - action: action_get_movie_director
