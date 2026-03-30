@@ -1,0 +1,118 @@
+# ============================================================
+# domain.yml — The Bot's Complete Knowledge Universe
+# ============================================================
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - bot_challenge
+  - out_of_scope
+  - thank_you
+  - ask_movie_recommendation
+  - ask_movie_by_genre
+  - ask_movie_details
+  - ask_movie_director
+  - ask_movie_cast
+  - ask_now_playing
+  - ask_song_recommendation
+  - ask_song_by_genre
+  - ask_artist_info
+  - ask_song_details
+  - ask_top_songs
+
+entities:
+  - genre
+  - movie_title
+  - artist_name
+  - song_title
+
+slots:
+  current_movie:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: movie_title
+
+  current_artist:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: artist_name
+
+  preferred_genre:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: genre
+
+  conversation_topic:
+    type: categorical
+    values:
+      - music
+      - movies
+      - none
+    initial_value: none
+    influence_conversation: true
+    mappings:
+      - type: custom
+
+responses:
+  utter_greet:
+    - text: "Hey! 👋 I'm your Music & Movies assistant. Ask me to recommend a movie, tell you about an artist, or anything about films and music!"
+    - text: "Hi there! 🎬🎵 I know a lot about movies and music. What would you like to explore today?"
+    - text: "Hello! Ready to talk movies and music? What are you in the mood for?"
+
+  utter_goodbye:
+    - text: "Goodbye! 🎬 Hope you enjoy whatever you watch or listen to next!"
+    - text: "See you! 🎵 Come back anytime for more movie and music recommendations."
+
+  utter_thank_you:
+    - text: "You're welcome! Let me know if you want more recommendations. 🎵🎬"
+    - text: "Happy to help! Anything else you'd like to know about?"
+
+  utter_affirm:
+    - text: "Great! Let me know what you'd like to explore next."
+
+  utter_bot_challenge:
+    - text: "Yes, I'm a chatbot! 🤖 Built with Rasa to help you discover great movies and music. What can I find for you?"
+
+  utter_out_of_scope:
+    - text: "I specialise in movies and music only! 🎬🎵 Try asking me for a movie recommendation or info about an artist."
+    - text: "That's outside my expertise — I only know about movies and music. Want a recommendation?"
+
+  utter_default_fallback:
+    - text: "Hmm, I didn't quite catch that. 🤔 Could you rephrase? I'm best at answering questions about movies and music!"
+    - text: "I'm not sure I understood. Try asking something like 'Recommend a thriller' or 'Tell me about Taylor Swift'."
+
+  utter_ask_for_genre_movies:
+    - text: "What genre are you in the mood for? 🎬 I know thriller, action, comedy, drama, horror, sci-fi, romance, and more!"
+
+  utter_no_movie_found:
+    - text: "I couldn't find a movie matching that. Try a different genre or title?"
+
+  utter_ask_for_genre_music:
+    - text: "What genre are you feeling? 🎵 I know pop, rock, jazz, hip-hop, classical, R&B, country, and more!"
+
+  utter_no_music_found:
+    - text: "I couldn't find anything matching that. Try a different genre or artist name?"
+
+actions:
+  - action_recommend_movie
+  - action_recommend_song
+  - action_get_movie_details
+  - action_get_movie_director
+  - action_get_movie_cast
+  - action_get_artist_info
+  - action_get_song_details
+  - action_get_top_songs
+  - action_get_now_playing
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: false
