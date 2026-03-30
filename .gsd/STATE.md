@@ -14,6 +14,10 @@
   - Create files/milestones one at a time.
   - Generate at least 10 examples per intent when generating training data.
 
-## Current Focus
-- Project has just been initialized via `/new-project`.
-- Ready to begin Milestone 1 (Environment Setup) via `/plan 1` (or checking `/progress`).
+## Current Position
+- **Phase**: 2
+- **Task**: Planning complete
+- **Status**: Ready for execution
+
+## Next Steps
+1. /execute 2
