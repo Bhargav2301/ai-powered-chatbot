@@ -28,9 +28,8 @@ Enable Windows Long Paths to prevent training errors, and scaffold the exact Ras
   <name>Create config.yml</name>
   <files>config.yml</files>
   <action>
-    Create a minimal config.yml file configured strictly for NLU (no core policies yet, or default policies).
-    Pipeline must use WhitespaceTokenizer and DIETClassifier. No SpaCy/BERT.
-    Add CountVectorsFeaturizer and LexicalSyntacticFeaturizer.
+    Read the exact content of `.gsd/phases/2/templates/config.yml` and copy it exactly into `config.yml` in the root directory.
+    Do NOT modify any contents or remove any comments.
   </action>
   <verify>Get-Content config.yml</verify>
   <done>config.yml exists with WhitespaceTokenizer and DIETClassifier explicitly defined</done>

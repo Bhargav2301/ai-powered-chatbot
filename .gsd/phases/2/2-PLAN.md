@@ -19,8 +19,8 @@ Establish the intent and entity definitions within the domain file and populate 
   <name>Create domain.yml (Base structure)</name>
   <files>domain.yml</files>
   <action>
-    Create domain.yml with `intents` (including movie intents, music intents, bot meta intents) and `entities` (genre, movie_title, artist_name, song_title).
-    Include inline comments explaining the intent and entity structure.
+    Read the exact content of `.gsd/phases/2/templates/domain.yml` and copy it exactly into `domain.yml` in the root directory.
+    Do NOT modify any contents or remove any comments.
   </action>
   <verify>Get-Content domain.yml</verify>
   <done>domain.yml exists with all intents and entities listed</done>
@@ -30,9 +30,9 @@ Establish the intent and entity definitions within the domain file and populate 
   <name>Create movies_nlu.yml</name>
   <files>data/nlu/movies_nlu.yml</files>
   <action>
-    Create training data for the 6 movie intents defined in the PRD (ask_movie_recommendation, ask_movie_by_genre, ask_movie_details, ask_movie_director, ask_movie_cast, ask_now_playing).
-    Provide EXACTLY or MORE than 10 examples per intent! This is a strict constraint.
-    Annotate entities properly: [inception](movie_title), [thriller](genre).
+    Create data/nlu/ directories if needed.
+    Read the exact content of `.gsd/phases/2/templates/movies_nlu.yml` and copy it exactly into `data/nlu/movies_nlu.yml`.
+    Do NOT modify any contents or remove any comments.
   </action>
   <verify>Get-Content data/nlu/movies_nlu.yml</verify>
   <done>movies_nlu.yml contains ≥60 examples total, correctly annotated</done>

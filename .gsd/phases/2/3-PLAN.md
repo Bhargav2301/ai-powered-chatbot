@@ -19,9 +19,9 @@ Populate the Music NLU training data file and global rules.
   <name>Create music_nlu.yml</name>
   <files>data/nlu/music_nlu.yml</files>
   <action>
-    Create training data for the 5 music intents and 4 meta intents defined in the PRD.
-    Provide EXACTLY or MORE than 10 examples per intent!
-    Annotate entities properly: [taylor swift](artist_name), [pop](genre).
+    Create data/nlu/ directories if needed.
+    Read the exact content of `.gsd/phases/2/templates/music_nlu.yml` and copy it exactly into `data/nlu/music_nlu.yml`.
+    Do NOT modify any contents or remove any comments.
   </action>
   <verify>Get-Content data/nlu/music_nlu.yml</verify>
   <done>music_nlu.yml exists and has robust examples</done>

@@ -1,0 +1,132 @@
+version: "3.1"
+
+nlu:
+
+- intent: ask_song_recommendation
+  examples: |
+    - Recommend a song
+    - What should I listen to?
+    - Suggest some music
+    - What's a good song?
+    - Give me a music recommendation
+    - Play me something good
+    - I need new music to listen to
+    - What songs do you recommend?
+    - Suggest me a track
+    - What music should I listen to today?
+    - Can you recommend some music?
+    - Help me find a good song
+    - What's worth listening to?
+    - Tell me a great song
+    - Any music recommendations?
+
+- intent: ask_song_by_genre
+  examples: |
+    - I want to listen to some [pop](genre) music
+    - Recommend a [rock](genre) song
+    - Any good [jazz](genre) tracks?
+    - I'm in the mood for [hip-hop](genre)
+    - Suggest some [classical](genre) music
+    - Show me [R&B](genre) songs
+    - I feel like [country](genre) music today
+    - What are good [electronic](genre) tracks?
+    - Give me a [reggae](genre) recommendation
+    - I love [indie](genre) music, any suggestions?
+    - Find me some [metal](genre) songs
+    - What are the best [blues](genre) tracks?
+    - Any great [folk](genre) artists?
+    - I want something [chill](genre) to listen to
+    - Recommend some [lo-fi](genre) music
+    - I'm feeling [sad](genre) music right now
+    - Give me some [workout](genre) music
+    - Any good [acoustic](genre) songs?
+
+- intent: ask_artist_info
+  examples: |
+    - Tell me about [Taylor Swift](artist_name)
+    - Who is [The Weeknd](artist_name)?
+    - What do you know about [Coldplay](artist_name)?
+    - Tell me about the band [Radiohead](artist_name)
+    - Who is [Kendrick Lamar](artist_name)?
+    - What's [Billie Eilish](artist_name)'s story?
+    - Give me info on [Ed Sheeran](artist_name)
+    - Tell me about [Doja Cat](artist_name)
+    - Who are [BTS](artist_name)?
+    - What's the background of [Eminem](artist_name)?
+    - Tell me about [Adele](artist_name)
+    - Who is [Harry Styles](artist_name)?
+    - Tell me about [Drake](artist_name)
+    - What do you know about [Pink Floyd](artist_name)?
+    - Who is [Bad Bunny](artist_name)?
+    - Give me facts about [Beyoncé](artist_name)
+
+- intent: ask_song_details
+  examples: |
+    - What is [Blinding Lights](song_title) about?
+    - Tell me about the song [Bohemian Rhapsody](song_title)
+    - What's [Shape of You](song_title) about?
+    - Describe [Hotel California](song_title)
+    - Tell me about [Lose Yourself](song_title)
+    - What is [Rolling in the Deep](song_title) about?
+    - Give me details about [Smells Like Teen Spirit](song_title)
+    - What's the meaning of [Imagine](song_title)?
+    - Tell me about [bad guy](song_title)
+    - What is [God's Plan](song_title) about?
+    - Describe the song [Watermelon Sugar](song_title)
+    - Tell me about [Levitating](song_title)
+    - What's [Anti-Hero](song_title) about?
+    - Tell me about [As It Was](song_title)
+    - Give me info on [Stay With Me](song_title)
+
+- intent: ask_top_songs
+  examples: |
+    - What are the top songs right now?
+    - What's trending in music?
+    - What are the most popular songs?
+    - Show me the music charts
+    - What's number one right now?
+    - What are the hottest tracks?
+    - What music is everyone listening to?
+    - What's on the top charts?
+    - Tell me the most streamed songs
+    - What's popular in music right now?
+    - What are the hit songs?
+    - What's trending on Spotify?
+    - What's the current number one song?
+    - Most popular music right now?
+
+- synonym: hip-hop
+  examples: |
+    - hip hop
+    - hiphop
+    - rap
+    - trap
+
+- synonym: R&B
+  examples: |
+    - rnb
+    - r and b
+    - rhythm and blues
+    - soul
+
+- synonym: electronic
+  examples: |
+    - EDM
+    - electronic dance music
+    - house
+    - techno
+    - dance music
+
+- synonym: classical
+  examples: |
+    - orchestral
+    - symphony
+    - classical music
+    - opera
+
+- synonym: lo-fi
+  examples: |
+    - lofi
+    - lo fi
+    - chill hop
+    - study music

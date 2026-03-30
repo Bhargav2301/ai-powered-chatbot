@@ -1,0 +1,43 @@
+# ============================================================
+# config.yml — Rasa NLU Pipeline & Dialogue Policies
+# ============================================================
+# This file controls TWO things:
+#   1. NLU Pipeline: How raw text is processed into intents/entities
+#   2. Policies: How the bot decides what action to take next
+#
+# IMPORTANT: Every component here is confirmed compatible with
+# Rasa 3.6.20 on Python 3.10 (Windows). Do not change versions.
+# ============================================================
+
+recipe: default.v1
+language: en
+
+pipeline:
+  - name: WhitespaceTokenizer
+  - name: RegexFeaturizer
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+  - name: DIETClassifier
+    epochs: 100
+    constrain_similarities: true
+  - name: EntitySynonymMapper
+  - name: ResponseSelector
+    epochs: 100
+  - name: FallbackClassifier
+    threshold: 0.4
+    ambiguity_threshold: 0.1
+
+policies:
+  - name: MemoizationPolicy
+  - name: RulePolicy
+    core_fallback_threshold: 0.4
+    core_fallback_action_name: "action_default_fallback"
+    enable_fallback_prediction: true
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+    constrain_similarities: true

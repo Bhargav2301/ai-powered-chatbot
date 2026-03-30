@@ -1,0 +1,139 @@
+version: "3.1"
+
+nlu:
+- intent: ask_movie_recommendation
+  examples: |
+    - Recommend me a movie
+    - What should I watch?
+    - Suggest a good film
+    - I want to watch something tonight
+    - Can you suggest a movie?
+    - What's a good movie to watch?
+    - Give me a movie recommendation
+    - I need something to watch
+    - What movie should I pick?
+    - Help me choose a movie
+    - Any good movies you'd recommend?
+    - I'm looking for a movie to watch
+    - What films do you suggest?
+    - Tell me a good movie
+    - Pick a movie for me
+
+- intent: ask_movie_by_genre
+  examples: |
+    - I want to watch a [thriller](genre)
+    - Suggest a [horror](genre) movie
+    - Any good [comedy](genre) films?
+    - I'm in the mood for [action](genre)
+    - Recommend a [drama](genre) movie
+    - Show me some [sci-fi](genre) films
+    - I feel like watching a [romance](genre)
+    - What are good [documentary](genre) movies?
+    - Give me a [mystery](genre) recommendation
+    - I love [animation](genre) movies, any suggestions?
+    - Find me a [crime](genre) film
+    - What are the best [fantasy](genre) movies?
+    - Any classic [western](genre) films?
+    - I want something [funny](genre) to watch
+    - Show me good [indie](genre) films
+    - Recommend a [historical](genre) movie
+    - Any great [superhero](genre) films?
+    - I'm feeling like [horror](genre) tonight
+
+- intent: ask_movie_details
+  examples: |
+    - Tell me about [Inception](movie_title)
+    - What is [Interstellar](movie_title) about?
+    - What's the plot of [Parasite](movie_title)?
+    - Can you describe [The Godfather](movie_title)?
+    - What happens in [The Dark Knight](movie_title)?
+    - Give me details about [Oppenheimer](movie_title)
+    - Tell me more about [The Matrix](movie_title)
+    - What's [Avengers: Endgame](movie_title) about?
+    - Describe [Forrest Gump](movie_title) to me
+    - I want to know about [Titanic](movie_title)
+    - What is [Schindler's List](movie_title) about?
+    - Tell me the story of [The Shawshank Redemption](movie_title)
+    - Explain [Memento](movie_title) to me
+    - What's the deal with [No Country for Old Men](movie_title)?
+    - Give me info on [Pulp Fiction](movie_title)
+
+- intent: ask_movie_director
+  examples: |
+    - Who directed [The Matrix](movie_title)?
+    - Who made [Parasite](movie_title)?
+    - Who is the director of [Inception](movie_title)?
+    - Tell me the director of [Interstellar](movie_title)
+    - Who was behind [The Dark Knight](movie_title)?
+    - Who directed [Oppenheimer](movie_title)?
+    - Which director made [Pulp Fiction](movie_title)?
+    - Who created [The Shawshank Redemption](movie_title)?
+    - Who directed [Avengers: Endgame](movie_title)?
+    - The director of [Forrest Gump](movie_title)?
+    - Who helmed [No Country for Old Men](movie_title)?
+    - Who shot [Schindler's List](movie_title)?
+    - Who's the filmmaker behind [Memento](movie_title)?
+    - Who directed it?
+    - Who made it?
+    - Who was the director?
+
+- intent: ask_movie_cast
+  examples: |
+    - Who stars in [Avengers: Endgame](movie_title)?
+    - What's the cast of [Inception](movie_title)?
+    - Who acts in [The Matrix](movie_title)?
+    - Who are the actors in [Parasite](movie_title)?
+    - Tell me the cast of [Oppenheimer](movie_title)
+    - Who plays in [The Dark Knight](movie_title)?
+    - Who's in [Forrest Gump](movie_title)?
+    - List the actors in [Pulp Fiction](movie_title)
+    - Who acted in [Interstellar](movie_title)?
+    - Who's in the cast?
+    - Who are the actors?
+    - Tell me who stars in it
+    - Who played the lead in [The Godfather](movie_title)?
+    - Which actors are in [Schindler's List](movie_title)?
+
+- intent: ask_now_playing
+  examples: |
+    - What movies are out now?
+    - What's playing in theaters?
+    - Recent movie releases?
+    - What are the latest movies?
+    - What came out recently?
+    - Show me new movies
+    - What's new in cinemas?
+    - Any recent releases?
+    - What films are playing right now?
+    - What are the newest movies?
+    - Tell me about movies released this year
+    - What's currently showing?
+    - Are there any new movies out?
+    - What just got released?
+
+- synonym: science fiction
+  examples: |
+    - sci-fi
+    - scifi
+    - science-fiction
+    - SF
+
+- synonym: romance
+  examples: |
+    - romantic
+    - rom-com
+    - romcom
+    - love story
+
+- synonym: comedy
+  examples: |
+    - funny
+    - humor
+    - humour
+    - comedic
+
+- synonym: animation
+  examples: |
+    - animated
+    - cartoon
+    - anime
