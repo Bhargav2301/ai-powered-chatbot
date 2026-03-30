@@ -19,7 +19,7 @@
 **Requirements**: Foundational setup.
 
 ### Phase 2: NLU Training Data
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Mielstone Branch**: `milestone-2/nlu-training-data`
 **Objective**: Define intents, entities, and train the initial NLU model.
 **Requirements**: REQ-01, REQ-02
