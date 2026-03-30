@@ -1,0 +1,158 @@
+# ============================================================
+# data/nlu/general_nlu.yml — Universal Intent Training Data
+# ============================================================
+# This file covers intents that are NOT specific to movies or
+# music — they apply to any conversation with the bot.
+#
+# WHY A SEPARATE FILE?
+#   Keeping domain-specific and domain-agnostic intents
+#   in separate files makes the project easier to maintain.
+#   Rasa merges all files in data/nlu/ at training time anyway.
+# ============================================================
+
+version: "3.1"
+
+nlu:
+
+# ── Intent: greet ─────────────────────────────────────────────
+# User is starting a conversation or saying hello.
+- intent: greet
+  examples: |
+    - Hi
+    - Hello
+    - Hey
+    - Hey there
+    - Good morning
+    - Good afternoon
+    - Good evening
+    - What's up
+    - Howdy
+    - Yo
+    - Hi there
+    - Hello there
+    - Greetings
+    - Hey bot
+    - Sup
+
+# ── Intent: goodbye ───────────────────────────────────────────
+# User is ending the conversation.
+- intent: goodbye
+  examples: |
+    - Bye
+    - Goodbye
+    - See you
+    - See ya
+    - Later
+    - Take care
+    - Good night
+    - Catch you later
+    - I'm done
+    - That's all for now
+    - Thanks, bye
+    - Cheers
+    - Talk to you later
+    - I have to go
+    - Bye bye
+
+# ── Intent: affirm ────────────────────────────────────────────
+# User is agreeing or confirming something the bot said.
+- intent: affirm
+  examples: |
+    - Yes
+    - Yeah
+    - Yep
+    - Sure
+    - Absolutely
+    - Exactly
+    - That's right
+    - Correct
+    - Indeed
+    - Of course
+    - Sounds good
+    - Yes please
+    - That works
+    - Go ahead
+    - Definitely
+
+# ── Intent: deny ──────────────────────────────────────────────
+# User is disagreeing or saying no.
+- intent: deny
+  examples: |
+    - No
+    - Nope
+    - Not really
+    - No thanks
+    - I don't think so
+    - That's wrong
+    - Negative
+    - Never mind
+    - Not that one
+    - No I don't want that
+    - Pass
+    - Skip that
+    - Not interested
+    - That's not it
+    - Nah
+
+# ── Intent: bot_challenge ─────────────────────────────────────
+# User is asking whether they're talking to a bot or human.
+- intent: bot_challenge
+  examples: |
+    - Are you a bot?
+    - Are you human?
+    - Am I talking to a robot?
+    - Are you real?
+    - Is this AI?
+    - Are you an AI?
+    - Are you a person?
+    - Is there a human on the other end?
+    - You're a bot, right?
+    - Who am I talking to?
+    - Are you ChatGPT?
+    - Are you a machine?
+    - Is this automated?
+    - Are you a virtual assistant?
+    - You're not real, are you?
+
+# ── Intent: thank_you ─────────────────────────────────────────
+# User is expressing gratitude.
+- intent: thank_you
+  examples: |
+    - Thank you
+    - Thanks
+    - Thanks a lot
+    - Thank you so much
+    - Cheers
+    - Much appreciated
+    - That's helpful
+    - Great, thanks
+    - Thanks for the help
+    - That was helpful
+    - Awesome, thanks
+    - Perfect, thank you
+    - You're the best
+    - This is great, thanks
+    - Really appreciate it
+
+# ── Intent: out_of_scope ──────────────────────────────────────
+# User is asking about something the bot can't help with.
+# Having training examples here teaches the model what
+# "out of scope" looks like, so it can respond appropriately
+# instead of guessing a wrong intent with low confidence.
+- intent: out_of_scope
+  examples: |
+    - What's the weather like?
+    - Can you book me a flight?
+    - What's the stock price of Apple?
+    - Tell me a joke
+    - Help me write an email
+    - What time is it?
+    - Who won the football game?
+    - Can you order food for me?
+    - What's the news today?
+    - Translate this for me
+    - Do my homework
+    - I need a recipe
+    - What's 2 plus 2?
+    - Tell me about history
+    - Help me with coding
