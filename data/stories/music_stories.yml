@@ -90,13 +90,15 @@ stories:
   - intent: ask_song_details         # "What's their most famous song about?"
   - action: action_get_song_details
 
-# ── Story 11: Recommendation → Affirm → More Info ─────────────
+# ── Story 11: Recommendation → Affirm → Artist Info ───────────
+# Bot says "Want to know more about any of these artists?"
+# so affirm should route to artist info, not song details.
 - story: song recommendation with affirmation
   steps:
   - intent: ask_song_recommendation
   - action: action_recommend_song
-  - intent: affirm                   # "Yes, tell me more!"
-  - action: action_get_song_details
+  - intent: affirm                   # "Sure!" / "Yes, tell me more!"
+  - action: action_get_artist_info
 
 # ── Story 12: Recommendation → Deny → New Genre ───────────────
 # User rejects recommendation and tries a different genre.

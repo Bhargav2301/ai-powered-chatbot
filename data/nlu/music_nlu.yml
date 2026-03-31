@@ -59,6 +59,19 @@ nlu:
     - What do you know about [Pink Floyd](artist_name)?
     - Who is [Bad Bunny](artist_name)?
     - Give me facts about [Beyoncé](artist_name)
+    - Sure, tell me about [Selena Gomez](artist_name)
+    - Yes I want to know about [The Weeknd](artist_name)
+    - Sure, who is [Bruno Mars](artist_name)?
+    - Yeah tell me more about [Katy Perry](artist_name)
+    - Sure I want to know about [Taylor Swift](artist_name)
+    - Yes, give me info on [Coldplay](artist_name)
+    - Okay tell me about [Billie Eilish](artist_name)
+    - Sure, what about [Ed Sheeran](artist_name)?
+    - Tell me about [Selena Gomez](artist_name)
+    - Who is [Selena Gomez](artist_name)?
+    - I want to know about [Selena Gomez](artist_name)
+    - Tell me about [Bruno Mars](artist_name)
+    - I want to know about [Bruno Mars](artist_name)
 
 - intent: ask_song_details
   examples: |
