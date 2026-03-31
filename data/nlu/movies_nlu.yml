@@ -39,6 +39,26 @@ nlu:
     - Recommend a [historical](genre) movie
     - Any great [superhero](genre) films?
     - I'm feeling like [horror](genre) tonight
+    - I want to watch a [zombie](genre) movie
+    - Recommend a [zombie](genre) film
+    - Any good [zombie](genre) movies?
+    - Show me [zombie](genre) films
+    - I love [zombie](genre) movies
+    - Give me a [ghost](genre) movie
+    - Any [supernatural](genre) films?
+    - I want a [vampire](genre) movie
+    - Recommend a [superhero](genre) film
+    - Any [spy](genre) movies?
+    - I want a [heist](genre) movie
+    - Show me [slasher](genre) films
+    - I feel like a [disaster](genre) movie
+    - Any good [psychological](genre) thrillers?
+    - Recommend a [martial arts](genre) film
+    - I want to watch a [period](genre) drama
+    - Show me [coming of age](genre) movies
+    - Any [found footage](genre) horror films?
+    - I like [dark comedy](genre) movies
+    - Show me [noir](genre) films
 
 - intent: ask_movie_details
   examples: |
