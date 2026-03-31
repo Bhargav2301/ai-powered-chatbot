@@ -1,0 +1,30 @@
+# ============================================================
+# requirements.txt — AI-Powered Music & Movies Chatbot
+# ============================================================
+# Activate venv first: .\venv\Scripts\activate
+# Install all:         pip install -r requirements.txt
+# ============================================================
+
+# ── Core Framework ───────────────────────────────────────────
+rasa==3.6.20
+rasa-sdk==3.6.2
+
+# ── Movie Data (Milestone 4) ─────────────────────────────────
+# pandas: reads the Kaggle TMDB CSV during the one-time
+# prepare_movies_db.py conversion step only.
+# sqlite3 (built into Python) handles all runtime queries.
+pandas==2.0.3
+
+# ── Music API + HTTP (Milestone 4) ───────────────────────────
+# requests: makes HTTP calls to the Last.fm API
+requests==2.31.0
+
+# python-dotenv: loads LASTFM_API_KEY from .env into os.environ
+python-dotenv==1.0.0
+
+# ── Utilities ────────────────────────────────────────────────
+colorama==0.4.6
+
+# ── Development Tools ────────────────────────────────────────
+pytest==7.4.0
+black==23.7.0

@@ -1,184 +1,168 @@
 # 📓 DECISIONS.md — Architectural Decision Log
 ## AI-Powered Music & Movies Chatbot
 
-> This file captures every key decision made during the project.
-> It exists so the Antigravity GSD agent has a single source of truth
-> before executing any phase. Update this file before each milestone.
-
 ---
 
 ## ✅ DECISION-001 — No `rasa init` Scaffolding
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
-**Decision**: Do NOT run `rasa init`. All Rasa files created manually, one milestone at a time.
-
-**Impact**: Milestone 2, 3, 4 — all files created from scratch
+**Decision**: All Rasa files created manually, one milestone at a time.
 
 ---
 
 ## ✅ DECISION-002 — Separate NLU Files per Domain
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
-**Decision**: `data/nlu/movies_nlu.yml` + `data/nlu/music_nlu.yml` + `data/nlu/general_nlu.yml`
-
-**Impact**: `data/nlu/` directory structure
+**Decision**: `movies_nlu.yml` + `music_nlu.yml` + `general_nlu.yml`
 
 ---
 
 ## ✅ DECISION-003 — File Creation Order for Milestone 2
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
 **Decision**: `config.yml` → `domain.yml` → NLU files → `rasa train`
 
 ---
 
 ## ✅ DECISION-004 — NLU Pipeline Components
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
-**Decision**: `WhitespaceTokenizer` + dual `CountVectorsFeaturizer` + `DIETClassifier` (100 epochs) + `EntitySynonymMapper` + `FallbackClassifier`. No SpaCy, no BERT. Confirmed compatible with Rasa 3.6.20 / Python 3.10 / Windows.
+**Decision**: WhitespaceTokenizer + DIETClassifier (100 epochs) + FallbackClassifier.
+No SpaCy, no BERT. Rasa 3.6.20 / Python 3.10 / Windows confirmed.
 
 ---
 
 ## ✅ DECISION-005 — Windows Long Path Fix
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
-**Decision**: Enable Windows long path support via PowerShell registry edit before first `rasa train`.
+**Decision**: Registry edit to enable paths > 260 chars before first `rasa train`.
 
 ---
 
 ## ✅ DECISION-006 — Python Version
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
-**Decision**: Python 3.10.x (confirmed after failed install on Python 3.14).
+**Decision**: Python 3.10.x (3.14 incompatible with Rasa 3.6.x).
 
 ---
 
-## ✅ DECISION-007 — Data Source ⚠️ REVISED
-**Date**: 2026-03-31 | **Previous**: Static JSON files | **Status**: 🔒 Locked (UPDATED)
+## ✅ DECISION-007 — Data Source ⚠️ REVISED (v3 — FINAL)
+**Date**: 2026-03-31 | **Status**: 🔒 Locked
 
-**Decision**: Use **live external APIs** for all movie and music data.
+**Previous**: Static JSON → Live TMDB API → **Now: Hybrid (local SQLite + live Last.fm)**
 
-| Domain | API | Base URL | Auth |
-|---|---|---|---|
-| 🎬 Movies | TMDB (The Movie Database) | `https://api.themoviedb.org/3` | API Key (query param) |
-| 🎵 Music | Last.fm | `https://ws.audioscrobbler.com/2.0` | API Key (query param) |
+### Movies — Kaggle TMDB Dataset (Local SQLite)
+**Source**: https://www.kaggle.com/datasets/asaniczka/tmdb-movies-dataset-2023-930k-movies
 
-**API Keys stored in**: `.env` file (gitignored — NEVER committed)
-**Loaded via**: `python-dotenv` in `actions/actions.py`
+**Why not the live TMDB API?** API key access was unavailable.
+**Why not the raw CSV?** 930k rows — loading on every action call is too slow.
+**Why SQLite?** Millisecond queries, no network dependency, portable single file.
 
-**Rationale**:
-- Static JSON limits the bot to manually curated, stale data
-- Live APIs provide real-time, comprehensive, and accurate responses
-- Both TMDB and Last.fm use simple API key auth — no OAuth complexity
-- TMDB is the industry standard (used by Netflix, HBO, Apple TV)
-- Last.fm has 40M+ tracks with artist bios, top tracks, and similar artist recommendations
-- Significantly stronger portfolio signal than a hardcoded JSON lookup
-
-**Alternatives Rejected**:
-- Static JSON: Too limited and stale for a functional chatbot
-- Spotify API: Requires OAuth 2.0 — significant added complexity
-- MusicBrainz: No API key needed but lacks popularity/chart data
-- OMDB: Smaller and less reliable than TMDB
-
-**TMDB Endpoints Used**:
+**Setup flow**:
 ```
-GET /search/movie?query={title}          → Search movie by title
-GET /movie/{id}                          → Full movie details
-GET /movie/{id}/credits                  → Cast and director
-GET /discover/movie?with_genres={id}     → Movies by genre
-GET /genre/movie/list                    → Genre name → ID mapping
-GET /movie/now_playing                   → Currently in cinemas
+1. Download TMDB_all_movies.csv from Kaggle (manually)
+2. Place it at: data/TMDB_all_movies.csv
+3. Run: python scripts/prepare_movies_db.py
+4. This creates: data/movies.db (SQLite, gitignored)
+5. actions.py queries movies.db using sqlite3
 ```
 
-**Last.fm Endpoints Used**:
+**SQLite schema** (created by prep script from CSV columns):
+```sql
+CREATE TABLE movies (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  overview TEXT,
+  genres TEXT,
+  release_date TEXT,
+  vote_average REAL,
+  vote_count INTEGER,
+  popularity REAL,
+  runtime INTEGER,
+  status TEXT,
+  tagline TEXT,
+  original_language TEXT,
+  production_companies TEXT,
+  keywords TEXT
+);
 ```
-artist.getInfo?artist={name}             → Artist bio and stats
-artist.getTopTracks?artist={name}        → Top tracks by artist
-artist.getSimilar?artist={name}          → Similar artists
-track.getInfo?artist={a}&track={t}       → Track details
-chart.getTopTracks                       → Global trending tracks
-tag.getTopTracks?tag={genre}             → Tracks by genre tag
+
+**Queries used in actions.py**:
+```sql
+-- Genre search (genres column contains comma-separated genre names)
+SELECT title, overview, vote_average, release_date
+FROM movies WHERE genres LIKE '%thriller%'
+ORDER BY popularity DESC LIMIT 3;
+
+-- Title search
+SELECT * FROM movies
+WHERE title LIKE '%Inception%'
+ORDER BY popularity DESC LIMIT 1;
+
+-- Now playing (approximate: released in last 6 months)
+SELECT title, release_date FROM movies
+WHERE release_date >= date('now', '-6 months')
+AND status = 'Released'
+ORDER BY popularity DESC LIMIT 4;
 ```
+
+### Music — Last.fm Live API
+**Auth**: API Key only (no OAuth) — key obtained ✅
+**Base URL**: `https://ws.audioscrobbler.com/2.0`
+**Endpoints**:
+```
+artist.getInfo       → Bio, listeners, play count
+artist.getTopTracks  → Top tracks by artist
+artist.getSimilar    → Similar artists
+track.getInfo        → Track details and wiki
+chart.getTopTracks   → Global trending tracks
+tag.getTopTracks     → Tracks by genre tag
+```
+
+### Files gitignored (never committed):
+- `data/TMDB_all_movies.csv` (too large — 200MB+)
+- `data/movies.db` (regenerated from CSV)
+- `.env` (contains Last.fm API key)
+
+### Files committed:
+- `scripts/prepare_movies_db.py` (the conversion script)
+- `.env.example` (template, no real keys)
 
 **New dependencies**:
 ```
-requests==2.31.0
-python-dotenv==1.0.0
+pandas==2.0.3        ← reads the CSV during prep
+requests==2.31.0     ← Last.fm API calls
+python-dotenv==1.0.0 ← loads .env
 ```
+SQLite3 is built into Python — no extra install needed.
 
-**Impact**: `actions/actions.py`, `requirements.txt`, `.env`, `.env.example`
-**No** `data/movies.json` or `data/music.json` files needed.
+**Impact**: `actions/actions.py`, `scripts/prepare_movies_db.py`,
+`requirements.txt`, `.gitignore`, `data/movies.db`
 
 ---
 
 ## ✅ DECISION-008 — Conversation Memory Scope
 **Date**: 2026-03-30 | **Status**: 🔒 Locked
-
-**Decision**: Session-only memory. No persistent database across sessions.
-
-**Impact**: `domain.yml` slots, `endpoints.yml`
+**Decision**: Session-only memory. No persistent DB across sessions.
 
 ---
 
 ## ✅ DECISION-009 — API Key Management
 **Date**: 2026-03-31 | **Status**: 🔒 Locked
+**Decision**: `.env` file only. Never hardcoded. Loaded via `python-dotenv`.
 
-**Decision**: API keys stored in `.env` only. Loaded via `python-dotenv`. Never hardcoded.
-
-**`.env` structure** (create manually, never commit):
+**`.env` structure**:
 ```
-TMDB_API_KEY=your_tmdb_key_here
 LASTFM_API_KEY=your_lastfm_key_here
 ```
-
-**`.env.example`** (safe to commit — placeholder values only):
-```
-TMDB_API_KEY=your_tmdb_api_key_here
-LASTFM_API_KEY=your_lastfm_api_key_here
-```
-
-**Loading pattern**:
-```python
-from dotenv import load_dotenv
-import os
-load_dotenv()
-TMDB_API_KEY = os.getenv("TMDB_API_KEY")
-LASTFM_API_KEY = os.getenv("LASTFM_API_KEY")
-```
-
-**Impact**: `actions/actions.py`, `.gitignore` (`.env` already listed), new `.env.example`
+No TMDB key needed anymore — movies use local SQLite.
 
 ---
 
 ## ✅ DECISION-010 — HTTP Error Handling Strategy
 **Date**: 2026-03-31 | **Status**: 🔒 Locked
-
-**Decision**: Every API call wrapped in try/except with graceful fallback. Timeout = 5 seconds on all requests. Action server must never crash on network failure.
-
-**Standard pattern**:
-```python
-try:
-    response = requests.get(url, params=params, timeout=5)
-    response.raise_for_status()
-    data = response.json()
-except requests.exceptions.Timeout:
-    dispatcher.utter_message("Sorry, the request timed out. Try again!")
-    return []
-except requests.exceptions.RequestException:
-    dispatcher.utter_message("I couldn't fetch that right now. Try again later!")
-    return []
-```
-
-**Impact**: All 9 action classes in `actions/actions.py`
+**Decision**: All API calls wrapped in try/except, timeout=5s.
+All SQLite queries wrapped in try/except with graceful fallback messages.
 
 ---
 
 ## ✅ DECISION-011 — Frontend Channel
 **Date**: 2026-03-31 | **Status**: 🔒 Locked
-
-**Decision**: Rasa REST channel (`/webhooks/rest/webhook`) + plain HTML/CSS/JS using `fetch()`. No SocketIO.
-
-**Impact**: Milestone 5, `credentials.yml`, `frontend/script.js`
+**Decision**: Rasa REST channel + plain HTML/CSS/JS using fetch(). No SocketIO.
 
 ---
 
@@ -186,28 +170,25 @@ except requests.exceptions.RequestException:
 
 > **⚠️ READ BEFORE PLANNING OR EXECUTING PHASE 4**
 
-1. **No static JSON** — all data from TMDB and Last.fm live APIs
-2. **Install new deps first**: `pip install requests==2.31.0 python-dotenv==1.0.0`
-3. **Update `requirements.txt`** to include `requests` and `python-dotenv`
-4. **Create `.env.example`** (commit this) and `.env` (never commit — gitignored)
-5. **Implement all 9 action classes** in `actions/actions.py`
-6. **Every action must have**: docstring, try/except with timeout=5, slot updates
-7. **Create `endpoints.yml`** pointing action server to `http://localhost:5055/webhook`
-8. **Test sequence after implementation**:
+1. **Movies use LOCAL SQLite** — `data/movies.db` queried with `sqlite3` (built-in)
+2. **Music uses Last.fm LIVE API** — key loaded from `.env` via `python-dotenv`
+3. **NO TMDB API calls** — no TMDB_API_KEY needed anywhere
+4. **Run prep script FIRST**: `python scripts/prepare_movies_db.py` before testing actions
+5. **Install deps**: `pip install pandas==2.0.3 requests==2.31.0 python-dotenv==1.0.0`
+6. **Update `.gitignore`**: add `data/TMDB_all_movies.csv` and `data/movies.db`
+7. **All 9 action classes** implemented in `actions/actions.py`
+8. **Every action**: docstring + try/except + SlotSet for context
+9. **Test sequence**:
    ```
-   Terminal 1 (venv active): rasa run actions
-   Terminal 2 (venv active): rasa shell
+   Terminal 1: rasa run actions
+   Terminal 2: rasa shell
    ```
-9. **Developer is a beginner** — comment every API call explaining what it fetches and why
 
 ---
 
 ## 🔲 PENDING DECISIONS
-
 | ID | Question | Needed By |
 |---|---|---|
 | DECISION-012 | Deploy to cloud or local only? | Post-Milestone 6 |
-
----
 
 *Update this file before every GSD Discuss Phase.*
