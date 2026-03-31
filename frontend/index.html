@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Music & Movies Assistant</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <main class="chat-container">
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="avatar">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Celeste&backgroundColor=transparent" alt="Bot Avatar" />
+            </div>
+            <div class="header-info">
+                <h1>Celeste</h1>
+                <p>Music & Movies Assistant</p>
+            </div>
+        </header>
+
+        <!-- Message Window -->
+        <section id="messages" class="messages" aria-live="polite">
+            <!-- Starting Default Message -->
+            <div class="message bot-message fade-in-up">
+                <div class="bubble">
+                    Hello! Ready to talk about movies and music? What are you in the mood for?
+                </div>
+            </div>
+        </section>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="loading-wrapper hidden">
+            <div class="typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <footer class="input-area">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off" autofocus />
+            <button id="send-button" aria-label="Send Message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </footer>
+    </main>
+
+    <!-- Local JS -->
+    <script src="./script.js"></script>
+</body>
+</html>
