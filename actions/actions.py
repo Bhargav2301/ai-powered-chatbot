@@ -22,11 +22,13 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet
 
-load_dotenv()
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ENV_PATH = os.path.join(BASE_DIR, ".env")
+load_dotenv(dotenv_path=ENV_PATH)
+
 LASTFM_API_KEY = os.getenv("LASTFM_API_KEY")
 LASTFM_BASE    = "https://ws.audioscrobbler.com/2.0"
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH  = os.path.join(BASE_DIR, "data", "movies.db")
 
 logger = logging.getLogger(__name__)
