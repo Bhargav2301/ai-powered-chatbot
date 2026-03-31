@@ -1,0 +1,23 @@
+# Virtual environments
+venv/
+env/
+.env
+
+# Rasa specifics
+models/
+results/
+.rasa/
+
+# Python specifics
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Agent state
+tmp_gsd/
+*.log
+
+# Phase 4 DB
+data/TMDB_all_movies.csv
+data/movies.db

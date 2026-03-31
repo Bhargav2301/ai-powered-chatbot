@@ -31,9 +31,9 @@
 **Requirements**: REQ-04, REQ-06
 
 ### Phase 4: Custom Actions
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Mielstone Branch**: `milestone-4/custom-actions`
-**Objective**: Develop Python custom actions backed by static JSON files.
+**Objective**: Develop Python custom actions backed by Live APIs and SQLite Data.
 **Requirements**: REQ-03
 
 ### Phase 5: Web Frontend
