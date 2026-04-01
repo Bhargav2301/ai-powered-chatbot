@@ -1,0 +1,222 @@
+# ============================================================
+# tests/test_stories.yml — End-to-End Test Stories
+# ============================================================
+# These test stories verify the FULL pipeline:
+#   User message → NLU → Dialogue → Action → Response
+#
+# HOW TO RUN:
+#   .\venv\Scripts\activate
+#   rasa test --stories tests/test_stories.yml
+#
+# A test PASSES when the bot takes the exact action listed.
+# A test FAILS when the bot takes a different action.
+# ALL tests must pass before Milestone 6 is complete.
+#
+# IMPORTANT: The action server must be running for custom
+# action tests to pass:
+#   rasa run actions   (in a separate terminal)
+# ============================================================
+
+version: "3.1"
+
+stories:
+
+# ── TEST 1: Greeting Rule ─────────────────────────────────────
+# Verifies: RulePolicy fires on greet intent
+# Expected: utter_greet response
+- story: test greet rule
+  steps:
+  - user: |
+      Hi
+    intent: greet
+  - action: utter_greet
+
+# ── TEST 2: Goodbye Rule ──────────────────────────────────────
+# Verifies: RulePolicy fires on goodbye intent
+- story: test goodbye rule
+  steps:
+  - user: |
+      Bye
+    intent: goodbye
+  - action: utter_goodbye
+
+# ── TEST 3: Bot Challenge Rule ────────────────────────────────
+# Verifies: Bot always admits to being a bot (deterministic rule)
+- story: test bot challenge rule
+  steps:
+  - user: |
+      Are you a bot?
+    intent: bot_challenge
+  - action: utter_bot_challenge
+
+# ── TEST 4: Out of Scope Rule ─────────────────────────────────
+# Verifies: Bot redirects non-music/movie queries
+- story: test out of scope rule
+  steps:
+  - user: |
+      What is the weather today?
+    intent: out_of_scope
+  - action: utter_out_of_scope
+
+# ── TEST 5: Movie Recommendation ─────────────────────────────
+# Verifies: ask_movie_recommendation → action_recommend_movie
+- story: test movie recommendation
+  steps:
+  - user: |
+      Recommend me a movie
+    intent: ask_movie_recommendation
+  - action: action_recommend_movie
+
+# ── TEST 6: Movie by Genre ────────────────────────────────────
+# Verifies: genre entity extracted → action_recommend_movie
+- story: test movie by genre
+  steps:
+  - user: |
+      I want to watch a thriller
+    intent: ask_movie_by_genre
+    entities:
+    - genre: thriller
+  - action: action_recommend_movie
+
+# ── TEST 7: Movie Details ─────────────────────────────────────
+# Verifies: movie_title entity extracted → action_get_movie_details
+- story: test movie details
+  steps:
+  - user: |
+      Tell me about Inception
+    intent: ask_movie_details
+    entities:
+    - movie_title: Inception
+  - action: action_get_movie_details
+
+# ── TEST 8: Context-Aware Follow-up (CRITICAL) ───────────────
+# Verifies: context awareness — "it" resolves via current_movie slot
+# This is the most important test in the suite.
+- story: test context aware movie follow-up
+  steps:
+  - user: |
+      Recommend me a movie
+    intent: ask_movie_recommendation
+  - action: action_recommend_movie
+  - user: |
+      Tell me more about it
+    intent: ask_movie_details
+  - action: action_get_movie_details
+
+# ── TEST 9: Movie Director Follow-up ──────────────────────────
+# Verifies: 3-turn context chain — recommendation → details → director
+- story: test movie director context chain
+  steps:
+  - user: |
+      Recommend a horror movie
+    intent: ask_movie_by_genre
+    entities:
+    - genre: horror
+  - action: action_recommend_movie
+  - user: |
+      Who directed it?
+    intent: ask_movie_director
+  - action: action_get_movie_director
+
+# ── TEST 10: Now Playing ──────────────────────────────────────
+# Verifies: ask_now_playing → action_get_now_playing
+- story: test now playing
+  steps:
+  - user: |
+      What movies are out now?
+    intent: ask_now_playing
+  - action: action_get_now_playing
+
+# ── TEST 11: Song Recommendation ─────────────────────────────
+# Verifies: ask_song_recommendation → action_recommend_song
+- story: test song recommendation
+  steps:
+  - user: |
+      Recommend a song
+    intent: ask_song_recommendation
+  - action: action_recommend_song
+
+# ── TEST 12: Music by Genre ───────────────────────────────────
+# Verifies: genre entity in music context → action_recommend_song
+- story: test music by genre
+  steps:
+  - user: |
+      I want to listen to jazz music
+    intent: ask_song_by_genre
+    entities:
+    - genre: jazz
+  - action: action_recommend_song
+
+# ── TEST 13: Artist Info ──────────────────────────────────────
+# Verifies: artist_name entity → action_get_artist_info
+- story: test artist info
+  steps:
+  - user: |
+      Tell me about Taylor Swift
+    intent: ask_artist_info
+    entities:
+    - artist_name: Taylor Swift
+  - action: action_get_artist_info
+
+# ── TEST 14: Affirm + Artist Context (CRITICAL) ───────────────
+# Verifies: the bug fix — "Sure I want to know about X" → artist info
+# This was a real bug fixed during development.
+- story: test affirm leads to artist info after recommendation
+  steps:
+  - user: |
+      Recommend pop music
+    intent: ask_song_by_genre
+    entities:
+    - genre: pop
+  - action: action_recommend_song
+  - user: |
+      Sure I want to know about Bruno Mars
+    intent: ask_artist_info
+    entities:
+    - artist_name: Bruno Mars
+  - action: action_get_artist_info
+
+# ── TEST 15: Top Songs ────────────────────────────────────────
+# Verifies: ask_top_songs → action_get_top_songs
+- story: test top songs
+  steps:
+  - user: |
+      What are the top songs right now?
+    intent: ask_top_songs
+  - action: action_get_top_songs
+
+# ── TEST 16: Thank You Rule ───────────────────────────────────
+- story: test thank you rule
+  steps:
+  - user: |
+      Thank you so much
+    intent: thank_you
+  - action: utter_thank_you
+
+# ── TEST 17: NLU Fallback Rule ────────────────────────────────
+# Verifies: low-confidence input triggers fallback gracefully
+- story: test fallback handling
+  steps:
+  - user: |
+      xyzzy blorp flimflam
+    intent: nlu_fallback
+  - action: action_default_fallback
+
+# ── TEST 18: Full Conversation Flow ───────────────────────────
+# Verifies: complete greet → content → goodbye arc
+- story: test full conversation arc
+  steps:
+  - user: |
+      Hello
+    intent: greet
+  - action: utter_greet
+  - user: |
+      Recommend a comedy movie
+    intent: ask_movie_by_genre
+    entities:
+    - genre: comedy
+  - action: action_recommend_movie
+  - user: |
+      Goodbye
+    intent: goodbye
+  - action: utter_goodbye
