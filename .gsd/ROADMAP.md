@@ -37,13 +37,13 @@
 **Requirements**: REQ-03
 
 ### Phase 5: Web Frontend
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Mielstone Branch**: `milestone-5/web-frontend`
 **Objective**: Build and style the web chat interface, connected to Rasa API.
 **Requirements**: REQ-05
 
 ### Phase 6: Testing & Polish
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Mielstone Branch**: `milestone-6/testing-and-polish`
 **Objective**: Polish documentation, create e2e tests.
 **Requirements**: REQ-07, REQ-08
