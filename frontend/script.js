@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    sender: "user",
+                    sender: "user_bhargav",
                     message: text
                 })
             });
