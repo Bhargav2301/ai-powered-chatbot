@@ -4,48 +4,63 @@ plan: 1
 wave: 1
 ---
 
-# Plan 6.1: End-to-End Validation & Browser Test
+# Plan 6.1: E2E Test Stories & NLU Validation
 
 ## Objective
-Empirically verify that the full stack works end-to-end: Rasa action server, Rasa REST API with CORS, and the frontend UI. Catch any remaining integration bugs before polishing documentation.
+Create end-to-end test stories that validate the chatbot's core conversation flows, run Rasa's built-in test framework, and fix any failures. This proves the bot works correctly beyond manual testing.
 
 ## Context
-- frontend/index.html
-- frontend/script.js
-- actions/actions.py
-- credentials.yml
+- domain.yml — intent/action/slot definitions
+- data/stories/movies_stories.yml — movie conversation flows
+- data/stories/music_stories.yml — music conversation flows
+- data/rules/rules.yml — deterministic rule paths
+- .gsd/SPEC.md — success criteria requiring test validation
 
 ## Tasks
 
 <task type="auto">
-  <name>Validate Rasa REST endpoint accepts POST</name>
-  <files>credentials.yml, endpoints.yml</files>
+  <name>Create test_stories.yml with 5+ E2E test conversations</name>
+  <files>tests/test_stories.yml</files>
   <action>
-    - Start Rasa with REST + CORS enabled: `rasa run --enable-api --cors "*"`
-    - Start action server: `rasa run actions`
-    - Send a test POST via PowerShell to confirm the REST webhook responds:
-      `Invoke-RestMethod -Uri "http://localhost:5005/webhooks/rest/webhook" -Method POST -Body '{"sender":"test","message":"hello"}' -ContentType "application/json"`
-    - Confirm the response JSON contains a bot reply with text
+    - Create the `tests/` directory in the project root.
+    - Create `tests/test_stories.yml` with at least 5 complete end-to-end test stories.
+    - Each test story should use `## ` prefix to mark them as test conversation blocks.
+    - Required test conversations:
+      1. **Greet flow** — user greets, bot responds with utter_greet
+      2. **Movie genre recommendation** — user asks for a thriller movie, bot calls action_recommend_movie
+      3. **Movie context follow-up** — user asks for genre recommendation → then asks "tell me about the first one" (ask_movie_details) → bot calls action_get_movie_details
+      4. **Music genre recommendation** — user asks for pop songs → bot calls action_recommend_song
+      5. **Music affirm + artist info** — user asks for song recommendation → affirms → bot calls action_get_artist_info
+      6. **Out of scope handling** — user asks unrelated question → bot responds with utter_out_of_scope
+    - Use exact intent names and action names from domain.yml.
+    - Include inline YAML comments explaining what each test validates.
+    - Do NOT include entity annotations in test steps — only intent and action.
   </action>
-  <verify>Invoke-RestMethod returns valid JSON with a "text" field</verify>
-  <done>REST endpoint returns bot response to "hello" message</done>
+  <verify>Get-Content tests/test_stories.yml | Measure-Object -Line | Select-Object -ExpandProperty Lines</verify>
+  <done>test_stories.yml exists with at least 5 complete test stories totalling 30+ lines</done>
 </task>
 
-<task type="checkpoint:human-verify">
-  <name>Browser integration test</name>
-  <files>frontend/index.html</files>
+<task type="auto">
+  <name>Run Rasa test suite and fix failures</name>
+  <files>tests/test_stories.yml</files>
   <action>
-    - Open frontend/index.html in the browser
-    - Type "hello" and verify bot responds
-    - Type "recommend a zombie movie" and verify genre-filtered results
-    - Type "recommend jazz music" and verify Last.fm results (requires valid API key in .env)
-    - Capture screenshots showing all three interactions
+    - Activate the venv: `.\venv\Scripts\activate`
+    - Run: `rasa test --stories tests/test_stories.yml --no-plot`
+    - This validates story paths against the trained model.
+    - If any test story fails:
+      - Read the error output to identify which story failed and why
+      - Fix the test story to match actual model behaviour (NOT the other way around — do not retrain to fix tests)
+      - Re-run until all tests pass
+    - Run: `rasa test nlu --nlu data --cross-validation --folds 3 --no-plot`
+    - This validates NLU intent classification accuracy.
+    - Capture the overall intent accuracy percentage from output.
+    - If intent accuracy < 80%, note it as a known limitation but do NOT retrain in Phase 6.
   </action>
-  <verify>Visual confirmation of working chat UI with correct responses</verify>
-  <done>All three test messages produce correct, genre-filtered responses in the browser UI</done>
+  <verify>rasa test --stories tests/test_stories.yml --no-plot exits with code 0</verify>
+  <done>All test stories pass. NLU cross-validation results captured.</done>
 </task>
 
 ## Success Criteria
-- [ ] REST endpoint responds to POST requests with bot messages
-- [ ] Frontend correctly renders user/bot messages in the browser
-- [ ] Genre filtering works ("zombie" → horror movies)
+- [ ] `tests/test_stories.yml` contains 5+ test stories covering greet, movies, music, context, and out-of-scope
+- [ ] `rasa test --stories` passes with 0 failures
+- [ ] `rasa test nlu --cross-validation` runs and prints accuracy metrics

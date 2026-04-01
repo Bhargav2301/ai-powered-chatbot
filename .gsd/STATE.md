@@ -20,7 +20,9 @@
 - **Status**: Ready for execution
 
 ## Last Session Summary
-Phase 6 (Testing & Polish) planning complete. 2 plans across 2 waves: E2E validation then documentation polish.
+Phase 6 (Testing & Polish) plans rewritten to match user-locked scope:
+- Plan 6.1: E2E test stories (5+ test conversations) + `rasa test` + `rasa test nlu --cross-validation`
+- Plan 6.2: Comprehensive README.md (80+ lines) + merge all 6 milestone branches to main
 
 ## Next Steps
 1. /execute 6
