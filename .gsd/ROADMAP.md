@@ -1,19 +1,19 @@
 # ROADMAP.md
 
-> **Current Phase**: Not started
+> **Current Phase**: All Complete ✅
 > **Milestone**: v1.0
 
 ## Must-Haves (from SPEC)
-- [ ] 10+ Intent Classification
-- [ ] Contextual multi-turn conversation (3+ turns)
-- [ ] Custom actions with backend JSON data
-- [ ] Web-based UI widget
-- [ ] Testing and validation setup
+- [x] 10+ Intent Classification
+- [x] Contextual multi-turn conversation (3+ turns)
+- [x] Custom actions with backend JSON data
+- [x] Web-based UI widget
+- [x] Testing and validation setup
 
 ## Phases
 
 ### Phase 1: Environment Setup
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Mielstone Branch**: `milestone-1/environment-setup`
 **Objective**: Install Rasa, set up the venv, initialize git repo, and extensions.
 **Requirements**: Foundational setup.

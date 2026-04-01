@@ -20,9 +20,10 @@
 - **Status**: Verified
 
 ## Last Session Summary
-Phase 6 executed successfully. 2 plans, 4 tasks completed:
-- Plan 6.1: 18 E2E test stories created, `rasa test` + NLU evaluation run
-- Plan 6.2: README rewritten (191 lines), ROADMAP updated, .gitignore verified
+Phase 6 (Testing & Polish) executed successfully. 2 plans, 4 tasks completed:
+- Plan 6.1: 18 E2E test stories, `rasa test --stories` (100% per-action accuracy), NLU evaluation (308/308)
+- Plan 6.2: README.md rewritten (191 lines), .gitignore verified, ROADMAP finalized
+- All 6 milestone branches merged into main and pushed to origin
 
 ## Next Steps
-1. Final git cleanup — merge all milestone branches to main
+All phases complete. Milestone v1.0 delivered. 🎉
