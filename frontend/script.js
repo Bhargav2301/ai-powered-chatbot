@@ -5,6 +5,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const chatInput = document.getElementById("chat-input");
     const sendButton = document.getElementById("send-button");
+    const clearButton = document.getElementById("clear-button");
     const messagesContainer = document.getElementById("messages");
     const loadingIndicator = document.getElementById("loading-indicator");
 
@@ -21,6 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sendButton.addEventListener("click", () => {
         handleSend();
+    });
+
+    clearButton.addEventListener("click", () => {
+        const messages = messagesContainer.querySelectorAll('.message');
+        messages.forEach((msg, index) => {
+            if (index > 0) msg.remove(); // Keep the first default message
+        });
     });
 
     async function handleSend() {
@@ -87,8 +95,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isHTML) {
             bubbleDiv.innerHTML = content;
         } else {
-            // Use textContent directly avoiding XSS injections natively
-            bubbleDiv.textContent = content;
+            if (senderType === "bot" && typeof marked !== 'undefined') {
+                // Parse markdown for bot messages securely
+                bubbleDiv.innerHTML = marked.parse(content);
+            } else {
+                // Use textContent directly avoiding XSS injections natively
+                bubbleDiv.textContent = content;
+            }
         }
 
         messageDiv.appendChild(bubbleDiv);
