@@ -156,3 +156,22 @@ nlu:
     - What's 2 plus 2?
     - Tell me about history
     - Help me with coding
+
+# ── Intent: request_more ──────────────────────────────────────
+# User wants alternative suggestions or more of the same context.
+- intent: request_more
+  examples: |
+    - Suggest more
+    - I have watched them all already
+    - Could you suggest more
+    - Can you give me more options?
+    - I've already seen those
+    - I want different ones
+    - More like this
+    - I don't like these, show me others
+    - Got any other recommendations?
+    - More movies please
+    - More music please
+    - Another one
+    - Next
+    - Give me something else

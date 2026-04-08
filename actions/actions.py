@@ -195,7 +195,7 @@ class ActionRecommendMovie(Action):
                 WHERE genres LIKE ?
                 AND (adult = 'False' OR adult = '0' OR adult IS NULL)
                 ORDER BY popularity DESC
-                LIMIT 3
+                LIMIT 20
                 """,
                 (f"%{genre}%",),
             )
@@ -212,7 +212,7 @@ class ActionRecommendMovie(Action):
                 FROM movies
                 WHERE (adult = 'False' OR adult = '0' OR adult IS NULL)
                 ORDER BY popularity DESC
-                LIMIT 3
+                LIMIT 20
                 """
             )
 
@@ -223,11 +223,15 @@ class ActionRecommendMovie(Action):
             )
             return []
 
-        first_movie = rows[0]["title"]
+        # Randomly select up to 3 movies from the pool to keep suggestions fresh
+        import random
+        sampled_rows = random.sample(rows, min(3, len(rows)))
+
+        first_movie = sampled_rows[0]["title"]
         genre_text  = f"{raw_genre} " if raw_genre else ""
         movie_list  = "\n".join(
             f"  🎬 {r['title']} ({(r.get('release_date') or '')[:4]}) ⭐ {r.get('vote_average', 'N/A')}"
-            for r in rows
+            for r in sampled_rows
         )
 
         dispatcher.utter_message(
@@ -469,10 +473,10 @@ class ActionRecommendSong(Action):
         )
 
         if raw_genre:
-            data   = lastfm_get("tag.getTopTracks", {"tag": raw_genre.lower(), "limit": 5})
+            data   = lastfm_get("tag.getTopTracks", {"tag": raw_genre.lower(), "limit": 20})
             tracks = (data or {}).get("tracks", {}).get("track", [])
         else:
-            data   = lastfm_get("chart.getTopTracks", {"limit": 5})
+            data   = lastfm_get("chart.getTopTracks", {"limit": 20})
             tracks = (data or {}).get("tracks", {}).get("track", [])
 
         if not tracks:
@@ -482,11 +486,13 @@ class ActionRecommendSong(Action):
             )
             return []
 
-        tracks      = tracks[:4]
-        first_art   = artist_name(tracks[0])
+        import random
+        sampled_tracks = random.sample(tracks, min(4, len(tracks)))
+
+        first_art   = artist_name(sampled_tracks[0])
         genre_text  = f"{raw_genre} " if raw_genre else ""
         track_list  = "\n".join(
-            f"  🎵 {t['name']} — {artist_name(t)}" for t in tracks
+            f"  🎵 {t['name']} — {artist_name(t)}" for t in sampled_tracks
         )
 
         dispatcher.utter_message(

@@ -134,3 +134,19 @@ stories:
   - action: action_recommend_song
   - intent: affirm
   - action: action_get_artist_info
+
+# ── Story 16: Request More Loop ───────────────────────────────
+- story: music recommendation then request more
+  steps:
+  - intent: ask_song_recommendation
+  - action: action_recommend_song
+  - intent: request_more
+  - action: action_recommend_song
+
+# ── Story 17: Genre Recommendation then Request More ──────────
+- story: music genre recommendation then request more
+  steps:
+  - intent: ask_song_by_genre
+  - action: action_recommend_song
+  - intent: request_more
+  - action: action_recommend_song
