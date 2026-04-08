@@ -4,40 +4,45 @@ plan: 1
 wave: 1
 ---
 
-# Plan 5.1: REST Pipeline & Frontend Structure
+# Plan 5.1: Restore and Verify Web Frontend
 
 ## Objective
-Enable the Rasa REST webhook endpoint to accept asynchronous HTTP traffic and scaffold the HTML5 visual interface implementing the core Glassmorphic aesthetic mapped per REC-05.
+Restore the web chat interface files (index.html, script.js, style.css) to the `main` branch and verify their functionality with the Rasa API. This ensures the frontend is fully integrated and documented.
 
 ## Context
 - .gsd/SPEC.md
-- .gsd/DECISIONS.md (REST + Vanilla UI)
+- .gsd/ROADMAP.md
+- frontend/index.html
+- frontend/script.js
+- frontend/style.css
 
 ## Tasks
 
 <task type="auto">
-  <name>Enable Async Rasa REST Endpoint</name>
-  <files>credentials.yml</files>
+  <name>Restore Frontend Files</name>
+  <files>frontend/index.html, frontend/script.js, frontend/style.css</files>
   <action>
-    - Create `credentials.yml` in the project root if it does not already exist.
-    - Expose the exact YAML property `rest:` cleanly to ensure Rasa can intercept frontend POST commands.
+    Merge the missing frontend files from `origin/milestone-5/web-frontend` into the current `main` branch. 
+    - Ensure `frontend/script.js` uses `sender: "user_bhargav"` as per DECISION-008.
+    - Resolve any conflicts in ROADMAP.md or STATE.md that may arise from the merge.
   </action>
-  <verify>Get-Content credentials.yml</verify>
-  <done>File structurally contains the "rest:" array activation.</done>
+  <verify>git ls-tree -r HEAD frontend</verify>
+  <done>All three frontend files are present in the HEAD of the main branch.</done>
 </task>
 
 <task type="auto">
-  <name>Scaffold Main Interface HTML</name>
-  <files>frontend/index.html</files>
+  <name>Verify Frontend Connectivity</name>
+  <files>frontend/script.js</files>
   <action>
-    - Create the `frontend` directory in the root and initialize `index.html`.
-    - Inject modern HTML5 semantics defining an encapsulating `.chat-container`, a main `.messages` visualization window, and an `.input-area` referencing a text `input` component mapped via explicit `id` selectors for JS interaction.
-    - Import the Google Font "Outfit" identically referencing a premium 400/600 web typography aesthetic.
+    Validate that the frontend correctly communicates with the Rasa server (port 5005).
+    - Check that the REST API call in `frontend/script.js` points to `http://localhost:5005/webhooks/rest/webhook`.
+    - Verify that the action server is reachable.
   </action>
-  <verify>Test-Path frontend/index.html</verify>
-  <done>index.html exists containing chat bubbles, text inputs, and font linkings.</done>
+  <verify>Test-Path "frontend/index.html"</verify>
+  <done>Frontend files are verified and connected to the backend API.</done>
 </task>
 
 ## Success Criteria
-- [ ] Rasa webhook listener logically configured.
-- [ ] HTML scaffolding visually maps inputs/outputs natively.
+- [ ] index.html, style.css, and script.js are present in the `main` branch.
+- [ ] `frontend/script.js` uses `user_bhargav` as the sender ID.
+- [ ] Phase 5 is marked as ✅ Complete in ROADMAP.md.

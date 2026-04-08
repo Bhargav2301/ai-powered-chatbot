@@ -12,12 +12,13 @@ A context-aware conversational AI chatbot built with **Rasa Open Source** that c
 
 ## ✨ Features
 
-- **🎬 Movie Recommendations** — Genre-filtered results from a local SQLite database (50,000+ movies from TMDB)
+- **🎬 Movie Recommendations** — Genre-filtered, randomized results from a local SQLite database (50,000+ movies from TMDB)
 - **🎵 Music Recommendations** — Live song recommendations via the Last.fm API
 - **🎤 Artist Biographies** — Listener counts, play counts, and artist bios from Last.fm
 - **🧠 Multi-Turn Context** — 3+ turn conversations using slot memory (e.g., "recommend a thriller" → "tell me about the first one" → "who directed it?")
+- **🔄 Dynamic Discovery** — Backend intuitively loops and randomizes selections when you ask for "more" or "other options"
 - **🔒 Adult Content Filtering** — Explicit content filtered from both movie results and Last.fm bios
-- **💬 Web Chat UI** — Glassmorphic dark-mode chat interface with typing indicators
+- **💬 Web Chat UI** — Glassmorphic dark-mode interface with typing indicators, Markdown formatting, and a clear-chat button
 - **🤖 15+ Intents** — Covers greetings, genre requests, follow-ups, affirmations, denials, and out-of-scope handling
 - **⚡ NLU Fallback** — Graceful handling of unrecognized input
 

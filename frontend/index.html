@@ -10,18 +10,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <!-- Local CSS -->
     <link rel="stylesheet" href="./style.css">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
     <main class="chat-container">
         <!-- Header -->
         <header class="chat-header">
-            <div class="avatar">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Celeste&backgroundColor=transparent" alt="Bot Avatar" />
+            <div class="header-left">
+                <div class="avatar">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Celeste&backgroundColor=transparent" alt="Bot Avatar" />
+                </div>
+                <div class="header-info">
+                    <h1>Celeste</h1>
+                    <p>Music & Movies Assistant</p>
+                </div>
             </div>
-            <div class="header-info">
-                <h1>Celeste</h1>
-                <p>Music & Movies Assistant</p>
-            </div>
+            <button id="clear-button" class="icon-button" aria-label="Clear Chat" title="Clear Chat">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
+            </button>
         </header>
 
         <!-- Message Window -->
@@ -32,14 +43,16 @@
                     Hello! Ready to talk about movies and music? What are you in the mood for?
                 </div>
             </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="loading-wrapper hidden">
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
         </section>
 
-        <!-- Loading Indicator -->
-        <div id="loading-indicator" class="loading-wrapper hidden">
-            <div class="typing-dots">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
+
 
         <!-- Input Area -->
         <footer class="input-area">

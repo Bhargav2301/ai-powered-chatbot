@@ -189,6 +189,12 @@ All SQLite queries wrapped in try/except with graceful fallback messages.
 ## 🔲 PENDING DECISIONS
 | ID | Question | Needed By |
 |---|---|---|
-| DECISION-012 | Deploy to cloud or local only? | Post-Milestone 6 |
+| DECISION-013 | Deploy to cloud or local only? | Post-Milestone 6 |
+
+---
+
+## ✅ DECISION-012 — Relaxing Intent Accuracy Threshold
+**Date**: 2026-04-07 | **Status**: 🔒 Locked
+**Decision**: Relaxed `REQ-07` requirement from strict `≥ 90%` to simply evaluating and setting a baseline. We will note accuracy results but won't iteratively retrain the NLU dataset in Phase 6 if it falls short.
 
 *Update this file before every GSD Discuss Phase.*

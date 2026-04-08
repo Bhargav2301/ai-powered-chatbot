@@ -148,3 +148,19 @@ stories:
   steps:
   - intent: ask_movie_director
   - action: action_get_movie_director
+
+# ── Story 16: Request More Loop ───────────────────────────────
+- story: recommendation then request more
+  steps:
+  - intent: ask_movie_recommendation
+  - action: action_recommend_movie
+  - intent: request_more
+  - action: action_recommend_movie
+
+# ── Story 17: Genre Recommendation then Request More ──────────
+- story: genre recommendation then request more
+  steps:
+  - intent: ask_movie_by_genre
+  - action: action_recommend_movie
+  - intent: request_more
+  - action: action_recommend_movie
