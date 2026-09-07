@@ -1,0 +1,5 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="280dp" android:minHeight="80dp" android:targetCellWidth="4" android:targetCellHeight="1"
+    android:initialLayout="@layout/glance_default_loading_layout" android:resizeMode="horizontal"
+    android:widgetCategory="home_screen" android:updatePeriodMillis="0"
+    android:description="@string/capture_widget_description" />

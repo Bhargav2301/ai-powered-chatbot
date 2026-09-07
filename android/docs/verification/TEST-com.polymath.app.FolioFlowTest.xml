@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="com.polymath.app.FolioFlowTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T03:08:49.029Z" hostname="localhost" time="9.794">
+  <testcase name="onboard save a card and capture a persistent thought" classname="com.polymath.app.FolioFlowTest" time="9.794" />
+  </testsuite>

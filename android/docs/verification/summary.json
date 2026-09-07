@@ -1,0 +1,67 @@
+{
+  "date": "2026-09-07",
+  "tests": [
+    {
+      "suite": "com.polymath.app.FolioFlowTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.polymath.model.LearningTest",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.polymath.data.RepositoryTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.polymath.data.FeedParserTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "lint": [
+    {
+      "severity": "Warning",
+      "id": "UnusedAttribute",
+      "message": "Attribute `targetCellHeight` is only used in API level 31 and higher (current min is 28)"
+    },
+    {
+      "severity": "Warning",
+      "id": "UnusedAttribute",
+      "message": "Attribute `targetCellWidth` is only used in API level 31 and higher (current min is 28)"
+    },
+    {
+      "severity": "Warning",
+      "id": "UnusedAttribute",
+      "message": "Attribute `targetCellHeight` is only used in API level 31 and higher (current min is 28)"
+    },
+    {
+      "severity": "Warning",
+      "id": "UnusedAttribute",
+      "message": "Attribute `targetCellWidth` is only used in API level 31 and higher (current min is 28)"
+    },
+    {
+      "severity": "Warning",
+      "id": "AndroidGradlePluginVersion",
+      "message": "A newer version of com.android.library than 8.11.1 is available: 9.4.0. (There is also a newer version of 8.11.\ud835\udc65 available, if upgrading to 9.4.0 is difficult: 8.11.2)"
+    },
+    {
+      "severity": "Warning",
+      "id": "NewerVersionAvailable",
+      "message": "A newer version of org.jetbrains.kotlin.jvm than 2.1.21 is available: 2.4.10"
+    },
+    {
+      "severity": "Warning",
+      "id": "NewerVersionAvailable",
+      "message": "A newer version of com.squareup.okhttp3:okhttp than 4.12.0 is available: 5.5.0"
+    }
+  ],
+  "execution": "Local Gradle; Robolectric API 35; no physical device execution"
+}

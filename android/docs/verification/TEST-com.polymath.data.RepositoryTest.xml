@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="com.polymath.data.RepositoryTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-09-07T03:01:23.710Z" hostname="localhost" time="7.047">
+  <testcase name="stale note update is rejected" classname="com.polymath.data.RepositoryTest" time="5.782" />
+  <testcase name="note mode conversion preserves revisions and FTS replaces old words" classname="com.polymath.data.RepositoryTest" time="0.16" />
+  <testcase name="incorrect first attempt earns zero and successful later recall earns first credit" classname="com.polymath.data.RepositoryTest" time="0.143" />
+  <testcase name="FTS syntax is treated as text rather than executable query syntax" classname="com.polymath.data.RepositoryTest" time="0.068" />
+  <testcase name="undo expires after five seconds" classname="com.polymath.data.RepositoryTest" time="0.091" />
+  <testcase name="duplicate recall submission cannot double award EXP" classname="com.polymath.data.RepositoryTest" time="0.057" />
+  <testcase name="plan acceptance validates the idea revision" classname="com.polymath.data.RepositoryTest" time="0.083" />
+  <testcase name="task dependencies and daily EXP cap are enforced inside the transaction" classname="com.polymath.data.RepositoryTest" time="0.151" />
+  <testcase name="reopening reverses the award and completion cannot farm EXP" classname="com.polymath.data.RepositoryTest" time="0.093" />
+  <testcase name="save updates FTS in the same transaction and removal removes the result" classname="com.polymath.data.RepositoryTest" time="0.089" />
+  <testcase name="disk database retains the folio across a repository restart" classname="com.polymath.data.RepositoryTest" time="0.137" />
+  <testcase name="undo cannot delete a later explicit save" classname="com.polymath.data.RepositoryTest" time="0.103" />
+  <testcase name="duplicate swipe only trains once and undo creates a reversal" classname="com.polymath.data.RepositoryTest" time="0.085" />
+  </testsuite>

@@ -1,23 +1,23 @@
-# Virtual environments
-venv/
-env/
-.env
-
-# Rasa specifics
-models/
-results/
-.rasa/
-
-# Python specifics
+# Runtime, caches and private data
+**/.gradle/
+**/.kotlin/
+**/build/
+**/local.properties
+**/.idea/
+*.iml
+.venv/
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Agent state
-tmp_gsd/
+*.py[cod]
+.pytest_cache/
+.env
+.env.*
+!.env.example
+models/
+*.gguf
+*.onnx
+*.apk
 *.log
+*.jks
+*.keystore
 
-# Phase 4 DB
-data/TMDB_all_movies.csv
-data/movies.db
+.tools/

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Polymath</string>
+    <string name="pill_widget_description">A public starter lesson with a shortcut to practice.</string>
+    <string name="capture_widget_description">Open a new thought, research topic, or idea.</string>
+</resources>
