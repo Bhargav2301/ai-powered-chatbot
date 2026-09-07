@@ -1,6 +1,6 @@
 # Private RAG service — 0.2.0
 
-An authenticated FastAPI service for the Android app. It uses **all-MiniLM-L6-v2** (INT8 ONNX, 384 dimensions) for retrieval and **Qwen3-0.6B** (Q8_0 GGUF, llama.cpp) for generated answers. Both model families use Apache-2.0 licenses. The service does not store documents, conversations or private embeddings between requests. No proprietary API fallback is included.
+An authenticated FastAPI service for the Android app. It uses [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) (INT8 ONNX, 384 dimensions) for retrieval and [Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF) (Q8_0 GGUF, llama.cpp) for generated answers. Both model families use Apache-2.0 licenses. The service does not store documents, conversations or private embeddings between requests. No proprietary API fallback is included.
 
 ## Local setup: Linux x64
 

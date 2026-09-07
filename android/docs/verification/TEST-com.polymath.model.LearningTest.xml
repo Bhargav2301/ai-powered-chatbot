@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite name="com.polymath.model.LearningTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-09-07T02:53:20.008Z" hostname="localhost" time="0.047">
+<testsuite name="com.polymath.model.LearningTest" tests="11" skipped="0" failures="0" errors="0" time="0.055">
   <testcase name="review schedule saturates at thirty days" classname="com.polymath.model.LearningTest" time="0.012" />
   <testcase name="incorrect recall earns nothing and returns tomorrow" classname="com.polymath.model.LearningTest" time="0.0" />
-  <testcase name="positive feedback increases topic affinity" classname="com.polymath.model.LearningTest" time="0.007" />
-  <testcase name="levels reflect square thresholds" classname="com.polymath.model.LearningTest" time="0.001" />
-  <testcase name="replay after undo exactly matches never having trained that event" classname="com.polymath.model.LearningTest" time="0.0" />
-  <testcase name="rank is stable for a daily seed" classname="com.polymath.model.LearningTest" time="0.018" />
+  <testcase name="positive feedback increases topic affinity" classname="com.polymath.model.LearningTest" time="0.008" />
+  <testcase name="levels reflect square thresholds" classname="com.polymath.model.LearningTest" time="0.0" />
+  <testcase name="replay after undo exactly matches never having trained that event" classname="com.polymath.model.LearningTest" time="0.001" />
+  <testcase name="rank is stable for a daily seed" classname="com.polymath.model.LearningTest" time="0.019" />
   <testcase name="application EXP is capped at forty a day" classname="com.polymath.model.LearningTest" time="0.0" />
-  <testcase name="dismissal is weaker than positive feedback" classname="com.polymath.model.LearningTest" time="0.001" />
+  <testcase name="dismissal is weaker than positive feedback" classname="com.polymath.model.LearningTest" time="0.0" />
   <testcase name="mute is a hard exclusion including exploration" classname="com.polymath.model.LearningTest" time="0.001" />
-  <testcase name="template dependencies only refer to prior tasks" classname="com.polymath.model.LearningTest" time="0.007" />
+  <testcase name="template dependencies only refer to prior tasks" classname="com.polymath.model.LearningTest" time="0.01" />
   <testcase name="cold start prioritizes explicit follows" classname="com.polymath.model.LearningTest" time="0.0" />
   </testsuite>

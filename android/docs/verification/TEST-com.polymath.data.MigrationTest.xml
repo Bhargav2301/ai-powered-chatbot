@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="com.polymath.data.MigrationTest" tests="1" skipped="0" failures="0" errors="0" time="0.511">
+  <testcase name="v1 on disk upgrades with original notes saves EXP and swipe history intact" classname="com.polymath.data.MigrationTest" time="0.511" />
+  </testsuite>

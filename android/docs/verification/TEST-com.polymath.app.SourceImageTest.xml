@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="com.polymath.app.SourceImageTest" tests="1" skipped="0" failures="0" errors="0" time="0.243">
+  <testcase name="source image pixels and attribution render in the flashcard gallery" classname="com.polymath.app.SourceImageTest" time="0.243" />
+  </testsuite>

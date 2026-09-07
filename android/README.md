@@ -1,117 +1,67 @@
-# Polymath for Android
+# Polymath Android — 0.2.0
 
-A native, private folio for discovering ideas and turning them into useful work.
+Kotlin, Jetpack Compose and Material 3. Minimum Android 9 (API 28); compile/target API 36. JDK 17, Gradle 8.13, AGP 8.11.1, Kotlin 2.1.21 and Room 2.7.2 are pinned.
 
-**Milestone:** 0.1.0 — the first functional Android foundation of the approved local-first architecture. This is an early development build, not the complete AI beta.
+## Build and install
 
-## Open and run
+Open this directory as the Android Studio project. Install Android SDK platform 36 and build-tools 35.0.0, then run:
 
-1. Open this directory in Android Studio with Android Gradle Plugin 8.11 support or newer.
-2. Use JDK 17. Install Android SDK Platform 36 and Build Tools 35.0.0.
-3. Let Gradle sync, then run the `app` configuration on Android 9 / API 28 or later.
-
-The project includes the standard Gradle wrapper, with the Gradle 8.13 distribution checksum pinned. No API key, account, inference service, or model download is required.
-
-```sh
-./gradlew :app:assembleDebug
-./gradlew :core:model:test :core:data:testDebugUnitTest :app:testDebugUnitTest :app:lintDebug
+```bash
+bash gradlew :app:assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-On Windows, use `gradlew.bat`. Android Studio writes your machine's SDK location to the ignored `local.properties` file. The debug APK is generated at `app/build/outputs/apk/debug/app-debug.apk`.
+Application ID: `com.polymath.app`; version code: `2`. Signing keys are excluded from Git. Fresh checkouts and CI use the standard locally generated Android debug key. An existing local `dev/debug.keystore` is supported for development continuity; do not publish it. The delivered APK retains its previous signature, but a fresh checkout’s APK will not necessarily update it. Use a separate private key for production signing.
 
-The archive retains a development-only signing key in `dev/debug.keystore` so subsequent prototype builds can update this installation. Its standard development password is intentionally public. A production release must use a separate private signing key.
+## Modules
 
-## Try the main flow
+| Module | Contents |
+|---|---|
+| `app` | Hilt application, Compose screens, ViewModel, image loading, widgets and UI integration test |
+| `core:model` | Content types, 12-domain topic graph, logistic ranking, recall/EXP rules and plan templates |
+| `core:data` | Room v2, explicit migration, transactional repositories, RSS/Atom media parsing, dataset import, secure service configuration and RAG client |
 
-1. Select some interests or choose **Explore all topics**.
-2. On **Discover**, swipe right or tap **Like & save**. Tap **Undo** within five seconds to reverse the judgment.
-3. Open **Vault** and search for a word from the saved card.
-4. Open a knowledge pill and choose **Practice recall**. Choose an answer before revealing the explanation. Correct first recall earns 10 EXP; merely reading or saving earns none.
-5. Open **Graph** to inspect topic EXP and the next available practice. A list alternative provides individual topic controls.
-6. Capture a **Thought**, **Research topic**, or **Idea**. Save an idea, draft a template plan, and review and accept it.
-7. Complete each dependency-ordered task with a reflection. The Desk exposes the next ready task.
-8. From **Desk**, pin **One pill** or **Quick capture** to a compatible launcher. Public widget reveals do not award EXP.
-9. Enable **Fetch news** to retrieve public RSS feeds. Failed refreshes retain the existing folio. Publisher dates and fetch times are distinct.
+## Try the complete flow
 
-Notes have an explicit Save action in this milestone. Leaving an unsaved edit prompts before discarding it. Editing a saved note creates an immutable revision. Research and ideas expose additional goal and context fields.
+1. Choose topics or explore all. Right swipe saves a card; left dismisses; Undo lasts five seconds.
+2. Open a card to read its text, source link and source-image gallery. Use **Turn into idea** to retain the source association.
+3. Save a Thought, Research topic or Idea in Notebook. Idea plans are editable four-step templates that require acceptance before task completion.
+4. Practice recall for EXP; completed tasks require a reflection. Merely opening or saving a card earns no EXP.
+5. Open Vault for offline keyword search. Tap its chat icon, or the chat icon at the top of Desk.
+6. Configure the [private AI service](../services/rag/README.md). Select My vault or one imported dataset, ask a question, and inspect citations.
+7. In Chat → Datasets, add the built-in example or import a [JSON dataset](../datasets/README.md). Source cards join Discover immediately. Selecting a dataset in Chat queries all its imported documents, even those not saved to My vault.
+8. Pin One pill or Quick capture from Desk on a compatible launcher.
 
-## What is implemented
+## Persistence and integrity
 
-| Area | Behavior in 0.1 |
-| --- | --- |
-| Native interface | Kotlin, Compose Material 3, dark editorial cards, five destinations, readers, capture sheets, labeled gesture alternatives |
-| Local persistence | Room transactions and foreign keys, immutable note revisions, unique event and earning keys, DataStore preferences |
-| Discovery | Eight original, source-linked starter lessons; live RSS/Atom fetching after opt-in; finite daily deck; source diversity; mute exclusions |
-| Personalization | On-device logistic ranking with topic/type features, confidence-weighted swipe updates, cold-start follow preferences, 10% exploration slots |
-| Undo | Persisted reversal event, full training-event replay, five-second expiry, ownership-aware removal of swipe-created saves |
-| Vault | Transactionally synchronized SQLite FTS4 over saved cards and notes; prefix keyword matching; type filters; removal from the index on deletion |
-| Notes and projects | Three capture modes; revision checks; source-card links; four-phase template plans; draft acceptance; dependent tasks and reflections |
-| Learning graph | Stable topic positions, related-topic edges, pan/zoom, EXP levels, accessible topic-list alternative |
-| Recall | Persistent assessment episodes, answer-before-reveal, duplicate-safe awards, 1/3/7/14/30-day review schedule |
-| Application EXP | 20 per qualifying task, at most 40/day, once per task; reopening reverses its award |
-| Widgets | Public static recall pill with reveal and app-opening actions; three-mode quick capture; no private previews |
-| Background work | Opt-in, constrained, inexact two-hour RSS refresh; bounded downloads and network timeouts |
-| Privacy | Guest use, no telemetry, no private-data upload, cleartext network disabled, platform backup exclusions |
+Room v1 upgrades additively to v2: image metadata, dataset IDs, dataset records and chat history. Notes, saves, swipe events and EXP remain intact. Removing a dataset removes its source cards and saved copies; user-authored notes and EXP remain. Removing saved content, editing/deleting a note or deleting a dataset clears chat history to remove copied source excerpts. A source change cancels an in-flight answer.
 
-## Architecture
+Each API response is checked against the exact request corpus: dataset, source ID, revision, Unicode excerpt offsets, content and allowed citation IDs. Links, titles and images are reconstructed from local source records. No HTML from model output is executed.
 
-```mermaid
-flowchart TD
-    UI[Compose screens] --> VM[Hilt ViewModel]
-    VM --> Domain[Pure Kotlin rules]
-    VM --> Repository[Folio repository]
-    Repository --> Room[Room and FTS]
-    Repository --> Domain
-    Worker[News worker] --> Fetcher[Bounded RSS fetcher]
-    Fetcher --> Repository
-    Widgets[Glance widgets] --> Activity[Activity entry points]
-    Activity --> UI
+The service API key is encrypted with an Android Keystore AES-GCM key. The Room database is app-private but not additionally encrypted. Android backup is disabled. Images use HTTPS and memory caching; disk image caching is disabled.
+
+## Connection development
+
+Production accepts HTTPS origins without embedded credentials, query strings or paths. Debug builds also accept `http://127.0.0.1:8000`, `http://localhost:8000` and `http://10.0.2.2:8000`.
+
+For a USB-connected device with the service running on your computer:
+
+```bash
+adb reverse tcp:8000 tcp:8000
 ```
 
-The initial modular monolith uses three build modules:
+Then use `http://127.0.0.1:8000` in the debug app. Android Emulator may use `http://10.0.2.2:8000`. The API key and consent are still required. Arbitrary cleartext LAN origins are rejected. The release app does not inherit the debug network-security exceptions.
 
-- `core:model`: platform-independent domain types, recommendation updates, review/EXP rules, template generation, and explicit embedding/generation interfaces.
-- `core:data`: Room entities and DAO, transactional use cases, FTS indexing, RSS/Atom parsing, DataStore settings.
-- `app`: Hilt composition root, ViewModel, Compose feature packages, Android share entry point, WorkManager and Glance integration.
+## Verification
 
-Feature packages can be extracted into their own Gradle modules after boundaries stabilize. The initial repository is intentionally single-profile and local-only. There is no cloud schema or implicit synchronization.
+```bash
+bash gradlew :core:model:test :core:data:testDebugUnitTest :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
+```
 
-## Important implementation boundaries
+The UI test runs the actual Hilt Activity and Room repositories under Robolectric API 35 and captures screen images. [Build status](BUILD_STATUS.md) records the actual results. [The shared workflow](../.github/workflows/verify.yml) runs from the repository root with this directory as its Android working directory.
 
-- **Semantic embeddings and LLM inference are not integrated.** Search currently uses FTS4. The Ask surface returns actual saved excerpts; it does not fabricate a generated answer.
-- The approved next model adapters are `all-MiniLM-L6-v2` through ONNX Runtime and Qwen3-0.6B through a tested llama.cpp binding. Model licenses, tokenizer/pooling parity, signed manifests, memory, temperature, and latency gates must be verified before enabling them.
-- The template planner performs no internet research. Live-web RAG, citations attached to generated claims, model downloads, and private/external evidence separation remain upcoming work.
-- Starter assessments are authored examples linked to sources. They need a content review process before production expansion. Topic EXP measures credited activity, not certified expertise.
-- A single topic receives each award in this build. Fractional multi-topic allocations and concept-level mastery are not implemented.
-- The graph is a curated topic graph, not automatically extracted personal concept relationships.
-- There is one template plan per idea at a time. Drafts can be discarded and regenerated. Active-plan regeneration, task text editing, and merge/diff review are subsequent milestones.
-- RSS ingestion uses three fixed sources and stores bounded feed excerpts. It does not scrape full articles. Custom sources, conditional HTTP caching, canonical URL normalization, story clustering, and durable daily-deck snapshots are upcoming.
-- A widget cannot reproduce the app's swipe gestures. Lock-screen placement varies by OS and host; the public pill is eligible, while the capture widget opts out on API 36. No cross-device compatibility claim has been made.
-- Export/restore, backup recovery, automatic folder suggestions, note autosave, model-backed research, a light theme, and adaptive tablet navigation are not yet shipped. Uninstalling deletes the local folio.
+## Current limits
 
-## Integrity rules
+No on-device LLM or embedding model is bundled. Offline Vault search is FTS4 keyword search; AI semantic retrieval runs on the configured service. JSON imports are bounded to 150 sources, 300,000 text/title characters, 20,000 characters per source and six images per source. The app allows 20 imported datasets. Unsupported or oversized imports fail visibly; they are not silently truncated into an incomplete corpus.
 
-Canonical data and its searchable representation change in a single Room transaction. No separate index can retain a deleted note after a successful deletion. Saves are unique by content ID. Explicit saves acquire independent ownership so undoing a prior swipe cannot remove them.
-
-Swipe events preserve the feature vector and model version used at judgment time. Reversed events are excluded during replay; undo never subtracts an old gradient from a changed model.
-
-Recall submissions are unique by content ID, assessment edition, and due episode. A duplicate submission returns the original result. A failed answer schedules tomorrow without an immediate EXP retry. Application awards record zero-value capped completions too, preventing reopening and completing tomorrow to evade the cap.
-
-The app uses device-local UTC day boundaries for the daily deck and application cap. Timezone-aware learning days and clock-tampering resilience are future work; there is no competitive leaderboard.
-
-## Verification and next implementation work
-
-See [BUILD_STATUS.md](BUILD_STATUS.md) for the exact checks run for this handoff and [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) for the next engineering slices.
-
-Robolectric database tests cover transaction consistency, persisted restart behavior, replay-safe undo, duplicate recall submissions, revision conflicts, dependency ordering, and EXP farming prevention. The Compose flow test uses the actual Hilt activity and repositories under Android framework simulation. It does not replace physical-device testing.
-
-## Reference documentation
-
-- [Android Gradle Plugin 8.11 compatibility](https://developer.android.com/build/releases/agp-8-11-0-release-notes)
-- [Compose compiler setup](https://developer.android.com/develop/ui/compose/compiler)
-- [Room releases](https://developer.android.com/jetpack/androidx/releases/room)
-- [Glance app widgets](https://developer.android.com/develop/ui/compose/glance/create-app-widget)
-
-Dependency versions are pinned in `gradle/libs.versions.toml`. The source archive does not include SDKs, Gradle caches, production signing credentials, user data, or model weights.
-
-Migration note: signing keys are excluded from this Git checkout. Android generates a local debug key when no private local override exists.
+RSS retains up to six HTTPS images per entry and bounded feed excerpts, not full article scraping. The topic graph has curated relationships rather than inferred prerequisites. Plans remain templates. Export/restore, autosave, full-text PDFs/OCR and production device profiling are pending. Uninstalling removes local notes and history.

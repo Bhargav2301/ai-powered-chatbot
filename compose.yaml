@@ -1,0 +1,36 @@
+services:
+  llama:
+    build:
+      context: .
+      dockerfile: services/rag/Dockerfile.llama
+    volumes:
+      - ./models:/models:ro
+    networks: [inference]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+    # No host port: only the authenticated RAG service can access this container.
+  rag:
+    build:
+      context: .
+      dockerfile: services/rag/Dockerfile
+    environment:
+      POLYMATH_API_KEY: ${POLYMATH_API_KEY:?Set a random API key of at least 24 characters}
+      LLAMA_BASE_URL: http://llama:8081
+      POLYMATH_MODEL_DIR: /models
+    volumes:
+      - ./models:/models:ro
+    ports:
+      - 127.0.0.1:8000:8000
+    networks: [inference]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on: [llama]
+    restart: unless-stopped
+networks:
+  inference:
+    internal: true

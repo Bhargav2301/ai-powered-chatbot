@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<testsuite name="com.polymath.data.FeedParserTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-07T03:01:30.766Z" hostname="localhost" time="0.274">
-  <testcase name="Atom uses alternate link rather than self link" classname="com.polymath.data.FeedParserTest" time="0.164" />
-  <testcase name="insecure and executable source URLs are not ingested" classname="com.polymath.data.FeedParserTest" time="0.021" />
-  <testcase name="XML external entity declarations are rejected" classname="com.polymath.data.FeedParserTest" time="0.037" />
-  <testcase name="duplicate entries collapse to one canonical URL" classname="com.polymath.data.FeedParserTest" time="0.02" />
-  <testcase name="RSS preserves source dates and strips HTML from excerpts" classname="com.polymath.data.FeedParserTest" time="0.032" />
+<testsuite name="com.polymath.data.FeedParserTest" tests="5" skipped="0" failures="0" errors="0" time="0.316">
+  <testcase name="Atom uses alternate link rather than self link" classname="com.polymath.data.FeedParserTest" time="0.153" />
+  <testcase name="insecure and executable source URLs are not ingested" classname="com.polymath.data.FeedParserTest" time="0.032" />
+  <testcase name="XML external entity declarations are rejected" classname="com.polymath.data.FeedParserTest" time="0.032" />
+  <testcase name="duplicate entries collapse to one canonical URL" classname="com.polymath.data.FeedParserTest" time="0.03" />
+  <testcase name="RSS preserves source dates and strips HTML from excerpts" classname="com.polymath.data.FeedParserTest" time="0.068" />
   </testsuite>

@@ -1,0 +1,9 @@
+.git
+.tools
+.venv
+models
+android
+**/__pycache__
+**/build
+.env
+docs

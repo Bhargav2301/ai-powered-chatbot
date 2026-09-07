@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite name="com.polymath.data.RagTransportTest" tests="2" skipped="0" failures="0" errors="0" time="5.039">
+  <testcase name="an authentication failure is actionable and cancellation closes a waiting call" classname="com.polymath.data.RagTransportTest" time="4.964" />
+  <testcase name="Android client sends only the selected corpus and parses service NDJSON" classname="com.polymath.data.RagTransportTest" time="0.074" />
+  </testsuite>
