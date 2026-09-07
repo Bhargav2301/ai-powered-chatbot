@@ -1,0 +1,39 @@
+{
+  "test": "real-model authenticated HTTP RAG",
+  "models": [
+    "all-MiniLM-L6-v2 INT8",
+    "Qwen3-0.6B Q8_0"
+  ],
+  "runtime": "llama.cpp b10834 CPU; ONNX Runtime 1.22.1",
+  "elapsed_seconds": 1.41,
+  "question": "What voltage is needed to drive 2 amperes through a 6 ohm resistor?",
+  "response": {
+    "type": "answer",
+    "status": "answered",
+    "answer": "The voltage needed is 12 volts. [S1]",
+    "citations": [
+      {
+        "id": "S1",
+        "document_id": "ohm",
+        "dataset_id": "physics",
+        "revision": 1,
+        "title": "Ohm's law worked example",
+        "excerpt": "For an ohmic resistor at fixed temperature, voltage equals current multiplied by resistance: V = I times R. A 6 ohm resistor carrying 2 amperes has a potential difference of 12 volts.",
+        "start": 0,
+        "end": 183,
+        "source_url": "https://openstax.org/books/university-physics-volume-2/pages/9-4-ohms-law",
+        "images": [
+          {
+            "url": "https://example.org/circuit.png",
+            "alt": "Test source image metadata; not fetched by the model",
+            "caption": ""
+          }
+        ]
+      }
+    ],
+    "model": "Qwen3-0.6B",
+    "embedding_model": "sentence-transformers/all-MiniLM-L6-v2"
+  },
+  "image_check": "Metadata provenance only; model does not interpret images",
+  "passed": true
+}

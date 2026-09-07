@@ -1,0 +1,12 @@
+FROM python:3.12-slim AS download
+WORKDIR /build
+COPY scripts/download_llama.py ./download_llama.py
+RUN python download_llama.py --output /runtime
+
+FROM ubuntu:22.04
+RUN apt-get update && apt-get install --no-install-recommends -y libgomp1 libstdc++6 libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY --from=download /runtime/llama-b10834/ /opt/llama/
+USER 10001
+EXPOSE 8081
+ENTRYPOINT ["/opt/llama/llama-server"]
+CMD ["-m", "/models/qwen3-0.6b.gguf", "--host", "0.0.0.0", "--port", "8081", "--alias", "Qwen3-0.6B", "-c", "4096", "-t", "4", "--parallel", "1", "--jinja", "--reasoning", "off", "--no-webui"]
