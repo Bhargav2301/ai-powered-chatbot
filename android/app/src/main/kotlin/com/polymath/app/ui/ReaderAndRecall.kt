@@ -27,6 +27,7 @@ import java.time.format.DateTimeFormatter
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(22.dp)) {
             Eyebrow(if (card.kind == ContentKind.NEWS) "NEWS / ${Topics.title(card.topicId).uppercase()}" else "KNOWLEDGE PILL / ${Topics.title(card.topicId).uppercase()}")
             Text(card.title, style = MaterialTheme.typography.headlineLarge)
+            SourceImages(card.images)
             Text(card.summary, color = Muted, style = MaterialTheme.typography.bodyLarge)
             HorizontalDivider(color = BorderColor)
             if (card.body != card.summary) Text(card.body, style = MaterialTheme.typography.bodyLarge)

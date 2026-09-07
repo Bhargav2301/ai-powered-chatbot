@@ -2,6 +2,7 @@ package com.polymath.data
 
 import android.text.Html
 import com.polymath.model.ContentKind
+import com.polymath.model.SourceImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -30,7 +31,7 @@ class NewsFetcher(private val repository: FolioRepository) {
         var count = 0
         for (source in sources) {
             try {
-                val request = Request.Builder().url(source.url).header("User-Agent", "Polymath/0.1 RSS reader")
+                val request = Request.Builder().url(source.url).header("User-Agent", "Polymath/0.2 RSS reader")
                     .header("Accept", "application/rss+xml, application/atom+xml, application/xml, text/xml").build()
                 val entries = client.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) throw IOException("Feed request failed")
@@ -76,6 +77,8 @@ object FeedParser {
         val result = mutableListOf<ContentEntity>()
         var entryDepth = -1
         var title = ""; var link = ""; var description = ""; var published: String? = null
+        var images = mutableListOf<SourceImage>()
+        var rawDescription = ""
         var field: String? = null
         var fieldDepth = -1
         val text = StringBuilder()
@@ -83,8 +86,21 @@ object FeedParser {
             val name = parser.name?.lowercase()
             when (parser.eventType) {
                 XmlPullParser.START_TAG -> {
+                    // Images must belong to the current item/entry, never the channel logo.
+                    if (entryDepth > 0 && name in listOf("thumbnail", "content", "enclosure", "img", "link")) {
+                        val type = parser.getAttributeValue(null, "type") ?: ""
+                        val medium = parser.getAttributeValue(null, "medium")
+                        val mediaNamespace = parser.namespace?.contains("search.yahoo.com/mrss") == true
+                        val isImage = name in listOf("thumbnail", "img") || type.startsWith("image/") || medium == "image" || (mediaNamespace && name == "content" && type.isBlank())
+                        if (isImage) {
+                            val raw = parser.getAttributeValue(null, "url") ?: parser.getAttributeValue(null, "href") ?: parser.getAttributeValue(null, "src")
+                            raw?.let { SourceMedia.https(it, source.url) }?.let {
+                                images += SourceImage(it, parser.getAttributeValue(null, "alt") ?: "Source illustration")
+                            }
+                        }
+                    }
                     if (name == "item" || name == "entry") {
-                        entryDepth = parser.depth; title = ""; link = ""; description = ""; published = null
+                        entryDepth = parser.depth; title = ""; link = ""; description = ""; published = null; images.clear(); rawDescription = ""
                     } else if (entryDepth > 0 && parser.depth == entryDepth + 1) {
                         field = name; fieldDepth = parser.depth; text.clear()
                         if (name == "link" && parser.getAttributeValue(null, "rel") in listOf(null, "alternate")) {
@@ -99,7 +115,10 @@ object FeedParser {
                         when (field) {
                             "title" -> title = clean(value).take(200)
                             "link" -> if (value.isNotBlank()) link = value
-                            "description", "summary", "content", "encoded" -> if (description.isBlank()) description = clean(value).take(600)
+                            "description", "summary", "content", "encoded" -> {
+                                if (description.isBlank()) description = clean(value).take(600)
+                                rawDescription += value
+                            }
                             "pubdate", "published" -> published = value
                             "updated" -> if (published == null) published = value
                         }
@@ -112,7 +131,10 @@ object FeedParser {
                             val date = published?.let { raw -> runCatching { Instant.parse(raw).toEpochMilli() }.getOrNull()
                                 ?: runCatching { ZonedDateTime.parse(raw, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant().toEpochMilli() }.getOrNull() }
                             result += ContentEntity("news:$id", ContentKind.NEWS, title, description,
-                                description, source.topicId, source.title, url, date, fetchedAt)
+                                description, source.topicId, source.title, url, date, fetchedAt,
+                                images = (images + SourceMedia.fromHtml(rawDescription, url)).distinctBy { it.url }.take(6).map {
+                                    if (it.alt == "Source illustration") it.copy(alt = title) else it
+                                })
                         }
                         entryDepth = -1
                     }

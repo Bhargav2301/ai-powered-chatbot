@@ -3,8 +3,17 @@ package com.polymath.data
 import androidx.room.*
 import com.polymath.model.*
 import org.json.JSONArray
+import org.json.JSONObject
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 class Converters {
+    @TypeConverter fun images(value: List<SourceImage>): String = JSONArray().apply {
+        value.forEach { put(JSONObject().put("url", it.url).put("alt", it.alt).put("caption", it.caption)) }
+    }.toString()
+    @TypeConverter fun imageList(value: String): List<SourceImage> = JSONArray(value).let { a ->
+        List(a.length()) { i -> a.getJSONObject(i).let { SourceImage(it.getString("url"), it.optString("alt"), it.optString("caption")) } }
+    }
     @TypeConverter fun strings(value: List<String>): String = JSONArray(value).toString()
     @TypeConverter fun stringList(value: String): List<String> = JSONArray(value).let { a -> List(a.length()) { a.getString(it) } }
 }
@@ -26,9 +35,11 @@ data class ContentEntity(
     val correctAnswer: Int = -1,
     val explanation: String = "",
     val edition: Int = 1,
+    @ColumnInfo(defaultValue = "'[]'") val images: List<SourceImage> = emptyList(),
+    @ColumnInfo(defaultValue = "'public'") val datasetId: String = "public",
 ) {
     fun card() = Card(id, kind, title, summary, body, topicId, publisher, sourceUrl, publishedAt, fetchedAt,
-        question, answers, correctAnswer, explanation, edition)
+        question, answers, correctAnswer, explanation, edition, images, datasetId)
 }
 
 @Entity(tableName = "preferences")
@@ -104,11 +115,28 @@ data class SearchDocument(@PrimaryKey(autoGenerate = true) @ColumnInfo(name = "r
 @Entity(tableName = "search_fts")
 data class SearchFts(val title: String, val body: String)
 
+@Entity(tableName = "datasets")
+data class DatasetEntity(@PrimaryKey val id: String, val title: String, val importedAt: Long)
+
+@Entity(tableName = "chat_messages", indices = [Index("scope")])
+data class ChatMessageEntity(@PrimaryKey val id: String, val scope: String, val role: String,
+    val text: String, val citations: String = "[]", val status: String = "answered", val createdAt: Long)
+
 @Dao
 interface FolioDao {
+    @Query("SELECT * FROM datasets ORDER BY title") suspend fun datasets(): List<DatasetEntity>
+    @Upsert suspend fun dataset(value: DatasetEntity)
+    @Query("DELETE FROM datasets WHERE id = :id") suspend fun deleteDataset(id: String)
+    @Query("DELETE FROM contents WHERE datasetId = :id") suspend fun deleteDatasetContents(id: String)
+    @Query("SELECT * FROM chat_messages ORDER BY createdAt, id") suspend fun messages(): List<ChatMessageEntity>
+    @Insert suspend fun message(value: ChatMessageEntity)
+    @Query("DELETE FROM chat_messages") suspend fun clearMessages()
+    @Query("DELETE FROM chat_messages WHERE scope = :scope") suspend fun clearMessages(scope: String)
+
     @Query("SELECT * FROM contents") suspend fun contents(): List<ContentEntity>
     @Query("SELECT * FROM contents WHERE id = :id") suspend fun content(id: String): ContentEntity?
     @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insertContent(content: List<ContentEntity>)
+    @Query("UPDATE contents SET images = :images WHERE id = :id") suspend fun contentImages(id: String, images: List<SourceImage>)
     @Query("SELECT * FROM preferences") suspend fun preferences(): List<PreferenceEntity>
     @Upsert suspend fun preference(value: PreferenceEntity)
     @Query("SELECT * FROM swipes ORDER BY sequence") suspend fun swipes(): List<SwipeEntity>
@@ -148,6 +176,17 @@ interface FolioDao {
 
 @Database(entities = [ContentEntity::class, PreferenceEntity::class, SwipeEntity::class, SaveEntity::class,
     NoteEntity::class, NoteRevisionEntity::class, PlanEntity::class, TaskEntity::class, AttemptEntity::class,
-    ReviewEntity::class, ExpAwardEntity::class, SearchDocument::class, SearchFts::class], version = 1, exportSchema = true)
+    ReviewEntity::class, ExpAwardEntity::class, SearchDocument::class, SearchFts::class, DatasetEntity::class, ChatMessageEntity::class], version = 2, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class FolioDatabase : RoomDatabase() { abstract fun folio(): FolioDao }
+
+/** Additive upgrade: original notes, swipes, saves and EXP remain intact. */
+val MIGRATION_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE contents ADD COLUMN images TEXT NOT NULL DEFAULT '[]'")
+        db.execSQL("ALTER TABLE contents ADD COLUMN datasetId TEXT NOT NULL DEFAULT 'public'")
+        db.execSQL("CREATE TABLE IF NOT EXISTS datasets (id TEXT NOT NULL PRIMARY KEY, title TEXT NOT NULL, importedAt INTEGER NOT NULL)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS chat_messages (id TEXT NOT NULL PRIMARY KEY, scope TEXT NOT NULL, role TEXT NOT NULL, text TEXT NOT NULL, citations TEXT NOT NULL, status TEXT NOT NULL, createdAt INTEGER NOT NULL)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS index_chat_messages_scope ON chat_messages (scope)")
+    }
+}

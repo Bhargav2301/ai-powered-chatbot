@@ -8,6 +8,7 @@ android {
     compileSdk = 36
     defaultConfig { minSdk = 28; testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner" }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17 }
+    sourceSets.getByName("test").resources.srcDir("schemas")
     testOptions { unitTests.isIncludeAndroidResources = true }
 }
 kotlin { jvmToolchain(17) }
@@ -21,6 +22,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.datastore)
     testImplementation(libs.junit)
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation(libs.robolectric)
     testImplementation(libs.android.test.junit)
     testImplementation(libs.coroutines.test)

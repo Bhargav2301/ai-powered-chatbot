@@ -94,7 +94,7 @@ import com.polymath.model.*
             labelPaint.color = if (exp > 0) Sage.toArgb() else Ink.toArgb()
             drawContext.canvas.nativeCanvas.drawText("${LearningRules.level(exp)}", center.x, center.y + textSize / 3, labelPaint)
             labelPaint.color = Muted.toArgb()
-            drawContext.canvas.nativeCanvas.drawText(when (topic.id) { "ai" -> "AI"; "systems" -> "Systems"; "craft" -> "Craft"; else -> topic.title }, center.x, center.y + radius * scale + textSize * 1.5f, labelPaint)
+            drawContext.canvas.nativeCanvas.drawText(when (topic.id) { "ai" -> "AI"; "systems" -> "Systems"; "craft" -> "Craft"; "certifications" -> "Certifications"; "literature" -> "Literature"; else -> topic.title }, center.x, center.y + radius * scale + textSize * 1.5f, labelPaint)
         }
     }
 }

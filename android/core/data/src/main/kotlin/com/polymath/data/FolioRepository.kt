@@ -16,6 +16,7 @@ data class FolioSnapshot(
     val notes: List<NoteEntity> = emptyList(), val plans: List<PlanEntity> = emptyList(),
     val tasks: List<TaskEntity> = emptyList(), val attempts: List<AttemptEntity> = emptyList(),
     val reviews: List<ReviewEntity> = emptyList(), val awards: List<ExpAwardEntity> = emptyList(),
+    val datasets: List<DatasetEntity> = emptyList(), val chat: List<ChatMessageEntity> = emptyList(),
 ) {
     val activeSwipes: List<SwipeEntity> get() {
         val reversed = swipes.mapNotNull { it.reversalOf }.toSet()
@@ -28,8 +29,15 @@ data class FolioSnapshot(
         val day = LocalDate.ofEpochDay(now / LearningRules.DAY)
         val start = day.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
         val remaining = (20 - activeSwipes.count { it.createdAt >= start }).coerceAtLeast(0)
-        val events = activeSwipes.filter { it.modelVersion == Recommender.VERSION }.map {
-            TrainingEvent(it.actionId, it.features.split(',').map(String::toDouble), Judgment.valueOf(it.action))
+        val events = activeSwipes.mapNotNull { event ->
+            // v1's six topics retain their original positions. Replay legacy events in v2's feature space.
+            val original = event.features.split(',').mapNotNull(String::toDoubleOrNull)
+            val features = when {
+                event.modelVersion == 1 && original.size == 8 -> original.take(6) + List(Topics.all.size - 6) { 0.0 } + original.takeLast(2)
+                event.modelVersion == Recommender.VERSION && original.size == Recommender.dimensions -> original
+                else -> return@mapNotNull null
+            }
+            TrainingEvent(event.actionId, features, Judgment.valueOf(event.action))
         }
         return Recommender.rank(cards.filter { it.id !in seen }, preferences, events, now / LearningRules.DAY, now).take(remaining)
     }
@@ -38,12 +46,12 @@ data class FolioSnapshot(
 class FolioRepository(private val db: FolioDatabase, private val now: () -> Long = System::currentTimeMillis) {
     private val dao = db.folio()
     val snapshots: Flow<FolioSnapshot> = db.invalidationTracker.createFlow(
-        "contents", "preferences", "swipes", "saves", "notes", "plans", "tasks", "attempts", "reviews", "exp_awards"
+        "contents", "preferences", "swipes", "saves", "notes", "plans", "tasks", "attempts", "reviews", "exp_awards", "datasets", "chat_messages"
     ).map { snapshot() }
 
     suspend fun snapshot(): FolioSnapshot = db.withTransaction {
         FolioSnapshot(dao.contents().map { it.card() }, dao.preferences().map { it.preference() }, dao.swipes(),
-            dao.saves(), dao.notes(), dao.plans(), dao.tasks(), dao.attempts(), dao.reviews(), dao.awards())
+            dao.saves(), dao.notes(), dao.plans(), dao.tasks(), dao.attempts(), dao.reviews(), dao.awards(), dao.datasets(), dao.messages())
     }
 
     suspend fun initialize() = db.withTransaction {
@@ -84,6 +92,7 @@ class FolioRepository(private val db: FolioDatabase, private val now: () -> Long
         if (dao.save(event.contentId)?.originAction == actionId) {
             dao.deleteSave(event.contentId)
             dao.deleteDocument("content:${event.contentId}")
+            dao.clearMessages()
         }
         true
     }
@@ -98,6 +107,7 @@ class FolioRepository(private val db: FolioDatabase, private val now: () -> Long
     suspend fun removeSave(contentId: String) = db.withTransaction {
         dao.deleteSave(contentId)
         dao.deleteDocument("content:$contentId")
+        dao.clearMessages()
     }
 
     suspend fun saveNote(draft: NoteEntity): NoteEntity = db.withTransaction {
@@ -106,6 +116,7 @@ class FolioRepository(private val db: FolioDatabase, private val now: () -> Long
         if (previous != null && draft.revision < previous.revision) error("This note changed. Reopen it before editing.")
         val saved = draft.copy(revision = (previous?.revision ?: 0) + 1,
             createdAt = previous?.createdAt ?: now(), updatedAt = now())
+        dao.clearMessages()
         dao.note(saved)
         dao.revision(NoteRevisionEntity(saved.id, saved.revision, saved.mode, saved.title, saved.body, saved.goal, saved.context, now()))
         indexDocument("note:${saved.id}", saved.mode.name, saved.id, saved.title.ifBlank { saved.body.take(60) },
@@ -115,6 +126,7 @@ class FolioRepository(private val db: FolioDatabase, private val now: () -> Long
 
     suspend fun deleteNote(id: String) = db.withTransaction {
         dao.deleteDocument("note:$id")
+        dao.clearMessages()
         dao.deleteNote(id)
     }
 
@@ -189,7 +201,28 @@ class FolioRepository(private val db: FolioDatabase, private val now: () -> Long
         attempt
     }
 
-    suspend fun ingest(items: List<ContentEntity>) = dao.insertContent(items)
+    suspend fun importDataset(value: DatasetImport) = db.withTransaction {
+        require(dao.datasets().none { it.id == value.dataset.id }) { "This dataset is already imported. Remove it before importing a replacement." }
+        require(dao.datasets().size < 20) { "Remove a dataset before importing another (20 maximum)." }
+        dao.dataset(value.dataset)
+        dao.insertContent(value.cards)
+    }
+    suspend fun deleteDataset(id: String) = db.withTransaction {
+        dao.contents().filter { it.datasetId == id }.forEach { dao.deleteDocument("content:${it.id}") }
+        dao.deleteDatasetContents(id)
+        dao.deleteDataset(id)
+        dao.clearMessages()
+    }
+    suspend fun addMessage(value: ChatMessageEntity) = dao.message(value)
+    suspend fun clearChat(scope: String) = dao.clearMessages(scope)
+
+    suspend fun ingest(items: List<ContentEntity>) = db.withTransaction {
+        dao.insertContent(items)
+        // Upgrade media on previously cached v1 entries without replacing their saved text.
+        items.filter { it.images.isNotEmpty() }.forEach { incoming ->
+            if (dao.content(incoming.id)?.images?.isEmpty() == true) dao.contentImages(incoming.id, incoming.images)
+        }
+    }
     suspend fun search(text: String): List<SearchDocument> = withContext(Dispatchers.IO) {
         // FTS4 prefix markers belong inside the phrase quotes (FTS5 differs).
         val tokens = Regex("[\\p{L}\\p{N}]+").findAll(text).map { "\"${it.value}*\"" }.take(12).toList()

@@ -2,6 +2,9 @@ package com.polymath.app
 
 import android.app.Application
 import android.content.Context
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import okhttp3.OkHttpClient
 import androidx.room.Room
 import androidx.work.*
 import com.polymath.data.*
@@ -17,7 +20,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @HiltAndroidApp
-class PolymathApplication : Application(), Configuration.Provider {
+class PolymathApplication : Application(), Configuration.Provider, ImageLoaderFactory {
+    override fun newImageLoader() = ImageLoader.Builder(this)
+        .okHttpClient(OkHttpClient.Builder().followSslRedirects(false)
+            .connectTimeout(10, TimeUnit.SECONDS).readTimeout(15, TimeUnit.SECONDS).callTimeout(25, TimeUnit.SECONDS).build())
+        .diskCache(null).build()
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setMinimumLoggingLevel(android.util.Log.WARN).build()
     @Inject lateinit var repository: FolioRepository
@@ -29,9 +36,11 @@ class PolymathApplication : Application(), Configuration.Provider {
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides @Singleton fun database(@ApplicationContext context: Context): FolioDatabase =
-        Room.databaseBuilder(context, FolioDatabase::class.java, "polymath.db").build()
+        Room.databaseBuilder(context, FolioDatabase::class.java, "polymath.db").addMigrations(MIGRATION_1_2).build()
     @Provides @Singleton fun repository(db: FolioDatabase) = FolioRepository(db)
     @Provides @Singleton fun settings(@ApplicationContext context: Context) = UserSettings(context)
+    @Provides @Singleton fun secret(@ApplicationContext context: Context) = ServiceSecret(context)
+    @Provides @Singleton fun rag() = RagClient(BuildConfig.DEBUG)
     @Provides @Singleton fun news(repository: FolioRepository) = NewsFetcher(repository)
 }
 

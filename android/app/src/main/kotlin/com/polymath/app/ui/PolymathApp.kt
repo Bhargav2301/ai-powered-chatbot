@@ -129,7 +129,7 @@ enum class Destination(val label: String, val icon: ImageVector) {
         RecallSheet(card, state.folio.reviews.firstOrNull { it.contentId == card.id }, close = { reviewId = null },
             answer = { selected, episode, result -> vm.answer(card, selected, episode, result) })
     }
-    if (ask) EvidenceSheet(vm, close = { ask = false })
+    if (ask) ChatScreen(vm, close = { ask = false })
 }
 
 @OptIn(ExperimentalLayoutApi::class)

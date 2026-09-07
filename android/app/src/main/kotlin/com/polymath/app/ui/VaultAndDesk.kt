@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
         }
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(20.dp, 20.dp, 20.dp, 100.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        item { PageHeading("A LITTLE LEARNING, APPLIED", "Your desk") }
+        item { PageHeading("A LITTLE LEARNING, APPLIED", "Your desk") { IconButton(ask) { Icon(Icons.Outlined.ChatBubbleOutline, "Open AI chat") } } }
         item { FolioPanel(Modifier.fillMaxWidth()) {
             Eyebrow("TODAY'S REFLECTION")
             Text("What could you try with what you already know?", style = MaterialTheme.typography.headlineMedium)
@@ -108,35 +108,10 @@ import kotlinx.coroutines.launch
         item { FolioPanel(Modifier.fillMaxWidth()) {
             Eyebrow("PRIVATE BY DEFAULT")
             Text("Your folio lives on this device.", style = MaterialTheme.typography.titleLarge)
-            Text("No account, analytics, or private-data upload. Uninstalling removes your local folio. Export and restore are planned for a later build.", color = Muted)
-            OutlinedButton(ask) { Text("Find evidence in my vault") }
-            Text("Version 0.1 · Local model packs are not included yet. Search currently matches words; answers show saved excerpts.", color = Muted, style = MaterialTheme.typography.bodySmall)
+            Text("No account or analytics. AI is optional: only the selected scope is sent to a service you configure. Uninstalling removes your local folio. Export and restore are planned.", color = Muted)
+            OutlinedButton(ask) { Text("Chat with my sources") }
+            Text("Version 0.2 · Keyword search works offline. Semantic retrieval and cited answers use your configured open-source AI service.", color = Muted, style = MaterialTheme.typography.bodySmall)
         } }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable fun EvidenceSheet(vm: FolioViewModel, close: () -> Unit) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var results by remember { mutableStateOf<List<SearchDocument>>(emptyList()) }
-    var loading by remember { mutableStateOf(false) }
-    LaunchedEffect(query) {
-        loading = true
-        delay(150)
-        results = if (query.isBlank()) emptyList() else vm.repository.search(query)
-        loading = false
-    }
-    ModalBottomSheet(close, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = CanvasColor) {
-        LazyColumn(Modifier.fillMaxWidth().imePadding(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            item { PageHeading("GROUNDED IN WHAT YOU KEEP", "Ask your vault") }
-            item { Text("Search saved evidence by keyword. Local answer generation will be available with a tested model pack.", color = Muted) }
-            item { OutlinedTextField(query, { query = it }, Modifier.fillMaxWidth(), label = { Text("Find a concept or phrase") }, leadingIcon = { Icon(Icons.Outlined.Search, null) }) }
-            if (loading) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
-            if (!loading && query.isNotBlank() && results.isEmpty()) item { Text("No saved evidence matches those words.", color = Muted) }
-            items(results.take(8), key = { it.resourceKey }) { result ->
-                FolioPanel(Modifier.fillMaxWidth()) { Eyebrow("SAVED EVIDENCE"); Text(result.title, style = MaterialTheme.typography.titleLarge); Text(result.body.take(900), style = MaterialTheme.typography.bodyLarge) }
-            }
-            item { Spacer(Modifier.height(24.dp)) }
-        }
-    }
-}

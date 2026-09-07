@@ -1,0 +1,177 @@
+package com.polymath.app.ui
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.polymath.app.FolioViewModel
+import com.polymath.data.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable fun ChatScreen(vm: FolioViewModel, close: () -> Unit) {
+    val state by vm.ui.collectAsStateWithLifecycle()
+    val scope by vm.chatScope.collectAsStateWithLifecycle()
+    val busy by vm.chatBusy.collectAsStateWithLifecycle()
+    val status by vm.chatStatus.collectAsStateWithLifecycle()
+    val error by vm.chatError.collectAsStateWithLifecycle()
+    val connectionMessage by vm.connectionMessage.collectAsStateWithLifecycle()
+    var question by rememberSaveable { mutableStateOf("") }
+    var connection by rememberSaveable { mutableStateOf(false) }
+    var datasets by rememberSaveable { mutableStateOf(false) }
+    val messages = state.folio.chat.filter { it.scope == scope }
+    val listState = rememberLazyListState()
+    LaunchedEffect(messages.size, busy) { if (messages.isNotEmpty()) listState.animateScrollToItem(messages.lastIndex) }
+    Dialog(onDismissRequest = close, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Surface(Modifier.fillMaxSize(), color = CanvasColor, contentColor = Ink) {
+            Column(Modifier.safeDrawingPadding().imePadding().fillMaxSize().padding(horizontal = 18.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    IconButton(close) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back to folio") }
+                    TextButton({ connection = true }) { Text("Connection") }
+                    IconButton({ vm.clearChat() }) { Icon(Icons.Outlined.DeleteSweep, "Clear conversation") }
+                }
+                PageHeading("YOUR SOURCES, IN CONVERSATION", "Ask Polymath")
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilterChip(scope == "vault", { vm.selectScope("vault") }, label = { Text("My vault") })
+                    state.folio.datasets.forEach { dataset -> FilterChip(scope == dataset.id, { vm.selectScope(dataset.id) }, label = { Text(dataset.title) }) }
+                    AssistChip({ datasets = true }, label = { Text("Datasets") }, leadingIcon = { Icon(Icons.Outlined.LibraryAdd, null) })
+                }
+                if (!state.settings.aiEnabled) TextButton({ connection = true }) { Text("Connect your private AI service to start") }
+                Text("Only this scope is sent. Source images load from their original hosts.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    items(messages, key = { it.id }) { message -> ChatBubble(message) }
+                    if (messages.isEmpty()) item { EmptyPanel("Start with something you keep.", "Ask a question about your saved sources and notes, or import a dataset. Every generated answer includes passages you can inspect.") }
+                }
+                if (busy) {
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(status, Modifier.weight(1f).padding(top = 12.dp), color = Sage)
+                        TextButton({ vm.cancelChat() }) { Text("Stop") }
+                    }
+                }
+                error?.let { Text(it, color = MaterialTheme.colorScheme.error); TextButton({ vm.retryChat() }, enabled = !busy) { Text("Retry question") } }
+                Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(question, { question = it.take(2000) }, Modifier.weight(1f), label = { Text("Ask your selected sources") }, maxLines = 4, enabled = !busy)
+                    IconButton({ vm.sendChat(question); question = "" }, enabled = !busy && question.isNotBlank() && state.settings.aiEnabled,
+                        modifier = Modifier.padding(top = 8.dp)) { Icon(Icons.AutoMirrored.Outlined.Send, "Send question", tint = if (state.settings.aiEnabled) Sage else Muted) }
+                }
+            }
+        }
+    }
+    if (connection) ConnectionDialog(state.settings, connectionMessage, close = { connection = false }, save = { endpoint, key, enabled ->
+        vm.configureAi(endpoint, key, enabled)
+    })
+    if (datasets) DatasetDialog(vm, state.folio, close = { datasets = false })
+}
+
+@Composable private fun ChatBubble(message: ChatMessageEntity) {
+    val uri = LocalUriHandler.current
+    FolioPanel(Modifier.fillMaxWidth()) {
+        Eyebrow(if (message.role == "user") "YOU" else if (message.status == "answered") "POLYMATH / QWEN · CHECK THE EVIDENCE" else "POLYMATH / EVIDENCE CHECK")
+        Text(message.text, style = MaterialTheme.typography.bodyLarge)
+        if (message.role == "assistant") {
+            val citations = remember(message.citations) { JSONArray(message.citations) }
+            for (i in 0 until citations.length()) {
+                val citation = citations.getJSONObject(i)
+                var expanded by rememberSaveable(message.id, i) { mutableStateOf(false) }
+                OutlinedButton({ expanded = !expanded }, Modifier.fillMaxWidth()) { Text("[${citation.getString("id")}] ${citation.getString("title")}") }
+                if (expanded) {
+                    Text(citation.getString("excerpt"), color = Muted)
+                    SourceImages(Converters().imageList(citation.optJSONArray("images")?.toString() ?: "[]"))
+                    if (!citation.isNull("source_url")) TextButton({ runCatching { uri.openUri(citation.getString("source_url")) } }) { Text("Open original source") }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable private fun ConnectionDialog(settings: Settings, message: String?, close: () -> Unit, save: (String, String, Boolean) -> Unit) {
+    var endpoint by rememberSaveable { mutableStateOf(settings.aiEndpoint) }
+    var key by remember { mutableStateOf("") }
+    var consent by rememberSaveable { mutableStateOf(settings.aiEnabled) }
+    ModalBottomSheet(close, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = CanvasColor) {
+        Column(Modifier.fillMaxWidth().heightIn(max = 640.dp).imePadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Text("Private AI connection", style = MaterialTheme.typography.headlineMedium)
+            Text("Run the Polymath service on a computer or server you trust. It uses open-source MiniLM and Qwen models. Hosting and downloads are your responsibility.", color = Muted)
+            OutlinedTextField(endpoint, { endpoint = it }, Modifier.fillMaxWidth(), label = { Text("HTTPS service origin") }, singleLine = true)
+            OutlinedTextField(key, { key = it }, Modifier.fillMaxWidth(), label = { Text(if (settings.aiEnabled) "API key (blank keeps current)" else "Service API key") }, visualTransformation = PasswordVisualTransformation(), singleLine = true)
+            Row { Checkbox(consent, { consent = it }); Text("Allow questions and text from my selected dataset to be sent to this service.", Modifier.padding(top = 8.dp)) }
+            Text("The supplied service keeps no document database. Choose your host carefully. Disconnecting removes the stored API key.", color = Muted, style = MaterialTheme.typography.bodySmall)
+            if (settings.aiEnabled) Text("Connected to ${settings.aiEndpoint}", color = Sage)
+            message?.let { Text(it, color = Sage) }
+            Button({ save(endpoint, key, consent); key = "" }, Modifier.fillMaxWidth(), enabled = consent || settings.aiEnabled) { Text(if (settings.aiEnabled && !consent) "Disconnect" else "Save connection") }
+            TextButton(close) { Text("Done") }
+        }
+    }
+}
+
+@Composable private fun DatasetDialog(vm: FolioViewModel, snapshot: FolioSnapshot, close: () -> Unit) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    var removing by remember { mutableStateOf<String?>(null) }
+    val importMessage by vm.datasetMessage.collectAsStateWithLifecycle()
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) coroutineScope.launch {
+            try {
+                val json = withContext(Dispatchers.IO) { context.contentResolver.openInputStream(uri)?.use {
+                    val output = java.io.ByteArrayOutputStream()
+                    val buffer = ByteArray(8192)
+                    while (output.size() <= DatasetParser.MAX_BYTES) {
+                        val count = it.read(buffer, 0, minOf(buffer.size, DatasetParser.MAX_BYTES + 1 - output.size()))
+                        if (count < 0) break
+                        output.write(buffer, 0, count)
+                    }
+                    val bytes = output.toByteArray()
+                    require(bytes.size <= DatasetParser.MAX_BYTES) { "Dataset exceeds 2 MiB." }
+                    bytes.toString(Charsets.UTF_8)
+                } ?: error("Could not open this file.") }
+                vm.importDataset(json)
+            } catch (e: Exception) { vm.reportError(e.message ?: "Import failed.") }
+        }
+    }
+    AlertDialog(close, title = { Text("Knowledge datasets") }, text = {
+        Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text("Import a Polymath JSON dataset with source text, topic IDs, images, and optional recall questions. Imported sources join your discovery deck.")
+            Text("Text stays on your phone until you query that dataset. Source images use their original HTTPS hosts.", color = Muted)
+            if (snapshot.datasets.none { it.id == "polymath-foundations" }) OutlinedButton({
+                coroutineScope.launch {
+                    val json = withContext(Dispatchers.IO) { context.assets.open("foundations.json").bufferedReader().use { it.readText() } }
+                    vm.importDataset(json)
+                }
+            }) { Text("Add example dataset") }
+            importMessage?.let { Text(it, color = Sage) }
+            snapshot.datasets.forEach { dataset ->
+                HorizontalDivider(color = BorderColor)
+                Text("${dataset.title} · ${snapshot.cards.count { it.datasetId == dataset.id }} sources")
+                TextButton({ removing = dataset.id }) { Text("Remove dataset") }
+            }
+        }
+    }, confirmButton = { TextButton({ picker.launch(arrayOf("application/json", "text/plain")) }) { Text("Import JSON") } },
+        dismissButton = { TextButton(close) { Text("Done") } })
+    removing?.let { id -> AlertDialog({ removing = null }, title = { Text("Remove this dataset?") },
+        text = { Text("Its cards and saved copies will be removed. Chat history is cleared to remove source excerpts. Your own notes and EXP remain.") },
+        confirmButton = { TextButton({ vm.deleteDataset(id); removing = null }) { Text("Remove") } },
+        dismissButton = { TextButton({ removing = null }) { Text("Cancel") } }) }
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "polymath-foundations",
+  "title": "Polymath foundations",
+  "documents": [
+    {
+      "id": "ohms-law",
+      "title": "A small circuit, three connected quantities",
+      "topic_id": "engineering",
+      "publisher": "Polymath original example; OpenStax reference",
+      "source_url": "https://openstax.org/books/university-physics-volume-2/pages/9-4-ohms-law",
+      "text": "For an ohmic resistor at fixed temperature, voltage equals current multiplied by resistance: V = I × R. A current of 2 amperes through a resistance of 6 ohms requires 12 volts. This relationship is a model for ohmic components, not every electrical device.",
+      "summary": "Connect voltage, current, and resistance in one worked example.",
+      "images": [
+        {
+          "url": "https://raw.githubusercontent.com/Bhargav2301/ai-powered-chatbot/main/datasets/assets/ohms-law.png",
+          "alt": "An original Polymath diagram: a 12 volt source connected to a 6 ohm resistor carries 2 amperes.",
+          "caption": "Polymath original illustration · V = I × R = 2 A × 6 Ω = 12 V"
+        }
+      ],
+      "quiz": {
+        "question": "What voltage drives 2 amperes through 6 ohms?",
+        "answers": [
+          "3 volts",
+          "12 volts",
+          "8 volts"
+        ],
+        "correct_answer": 1,
+        "explanation": "Multiply current by resistance: 2 × 6 = 12 volts."
+      }
+    },
+    {
+      "id": "history-context",
+      "title": "Ask who created the evidence",
+      "topic_id": "history",
+      "publisher": "Library of Congress reference",
+      "source_url": "https://www.loc.gov/programs/teachers/getting-started-with-primary-sources/",
+      "text": "A primary source comes from the period being studied. Evaluate who created it, its purpose, its audience and its context. Compare its account with independent evidence; proximity to events does not establish that every claim is accurate."
+    },
+    {
+      "id": "least-privilege",
+      "title": "Access should fit the task",
+      "topic_id": "certifications",
+      "publisher": "NIST reference",
+      "source_url": "https://csrc.nist.gov/glossary/term/least_privilege",
+      "text": "Least privilege grants a user or service only the permissions needed for its task. A report reader normally needs read access to the relevant reports, not permission to delete accounts. Review access regularly. This is conceptual study material, not an official certification question or syllabus."
+    },
+    {
+      "id": "validity",
+      "title": "Reasoning and premises both matter",
+      "topic_id": "philosophy",
+      "publisher": "Internet Encyclopedia of Philosophy reference",
+      "source_url": "https://iep.utm.edu/val-snd/",
+      "text": "A deductively valid argument cannot have true premises and a false conclusion. A sound argument is valid and has true premises. Assess the inference and the evidence supporting its premises separately."
+    }
+  ]
+}

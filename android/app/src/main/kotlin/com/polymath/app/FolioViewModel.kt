@@ -16,7 +16,16 @@ data class Notice(val message: String, val undoAction: String? = null)
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FolioViewModel @Inject constructor(val repository: FolioRepository, private val settings: UserSettings,
-    private val news: NewsFetcher) : ViewModel() {
+    private val news: NewsFetcher, private val rag: RagClient, private val secret: ServiceSecret) : ViewModel() {
+    val datasetMessage = MutableStateFlow<String?>(null)
+    val connectionMessage = MutableStateFlow<String?>(null)
+    val chatScope = MutableStateFlow("vault")
+    val chatBusy = MutableStateFlow(false)
+    val chatStatus = MutableStateFlow("")
+    val chatError = MutableStateFlow<String?>(null)
+    private var chatJob: Job? = null
+    private var lastQuestion = ""
+    private var chatGeneration = 0
     private val initialized = MutableStateFlow(false)
     private val notices = Channel<Notice>(Channel.BUFFERED)
     val messages = notices.receiveAsFlow()
@@ -54,6 +63,75 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
         action {
             refreshing.value = true
             try { settings.refreshed(news.refresh()) } finally { refreshing.value = false }
+        }
+    }
+    fun configureAi(endpoint: String, apiKey: String, enabled: Boolean) = viewModelScope.launch {
+        connectionMessage.value = null
+        try {
+            cancelChat()
+            val validated = if (enabled) rag.endpoint(endpoint) else endpoint
+            withContext(Dispatchers.IO) {
+                if (enabled) {
+                    require(apiKey.length >= 24 || secret.read().length >= 24) { "Enter the service's API key (at least 24 characters)." }
+                    if (apiKey.isNotBlank()) secret.save(apiKey)
+                } else secret.save("")
+            }
+            settings.aiConnection(validated, enabled)
+            connectionMessage.value = if (enabled) "Connection saved. Return to chat to ask your sources." else "Disconnected; the stored service key was removed."
+        } catch (e: CancellationException) { throw e }
+          catch (e: Exception) { connectionMessage.value = e.message?.take(220) ?: "Could not save this connection. Please retry." }
+    }
+    fun selectScope(scope: String) { cancelChat(); chatScope.value = scope; chatError.value = null; lastQuestion = "" }
+    fun cancelChat() { chatGeneration++; chatJob?.cancel(); chatBusy.value = false; chatStatus.value = "" }
+    fun clearChat() = action { cancelChat(); repository.clearChat(chatScope.value); lastQuestion = "" }
+    fun importDataset(json: String) = viewModelScope.launch {
+        datasetMessage.value = null
+        try {
+            val parsed = withContext(Dispatchers.Default) { DatasetParser.parse(json) }
+            repository.importDataset(parsed)
+            datasetMessage.value = "Imported ${parsed.cards.size} sources into ${parsed.dataset.title}"
+        } catch (e: CancellationException) { throw e }
+          catch (e: Exception) { datasetMessage.value = e.message?.take(220) ?: "The dataset could not be imported." }
+    }
+    fun deleteDataset(id: String) = action {
+        cancelChat(); repository.deleteDataset(id)
+        if (chatScope.value == id) chatScope.value = "vault"
+    }
+    fun reportError(message: String) { datasetMessage.value = message }
+    fun retryChat() { if (lastQuestion.isNotBlank()) sendChat(lastQuestion, retry = true) }
+    fun sendChat(question: String, retry: Boolean = false) {
+        if (chatBusy.value || question.isBlank()) return
+        val scope = chatScope.value
+        lastQuestion = question.trim()
+        chatError.value = null; chatBusy.value = true; chatStatus.value = "Preparing selected sources"
+        val generation = ++chatGeneration
+        chatJob = viewModelScope.launch {
+            var watcher: Job? = null
+            try {
+                val connection = settings.values.first()
+                require(connection.aiEnabled) { "Open Connection and configure your private AI service first." }
+                val snapshot = repository.snapshot()
+                val documents = RagCorpus.documents(snapshot, scope)
+                val previous = snapshot.chat.filter { it.scope == scope && it.role == "user" }.map { it.text }
+                val payload = RagCorpus.request(question, scope, documents, if (retry) previous.dropLast(1) else previous)
+                if (!retry) repository.addMessage(ChatMessageEntity(FolioRepository.uuid(), scope, "user", question.trim(), createdAt = System.currentTimeMillis()))
+                // A source edit/removal invalidates in-flight context, not merely the next request.
+                val job = coroutineContext[Job]!!
+                watcher = launch {
+                    repository.snapshots.collect { current ->
+                        if (runCatching { RagCorpus.documents(current, scope) }.getOrNull() != documents) {
+                            chatError.value = "The selected sources changed. Send the question again to use current evidence."
+                            job.cancel()
+                        }
+                    }
+                }
+                val reply = rag.answer(connection.aiEndpoint, withContext(Dispatchers.IO) { secret.read() }, payload, documents) { if (generation == chatGeneration) chatStatus.value = it }
+                require(RagCorpus.documents(repository.snapshot(), scope) == documents) { "Sources changed. Please retry." }
+                repository.addMessage(ChatMessageEntity(FolioRepository.uuid(), scope, "assistant", reply.text,
+                    reply.citations, reply.status, System.currentTimeMillis()))
+            } catch (e: CancellationException) { throw e }
+              catch (e: Exception) { if (generation == chatGeneration) chatError.value = e.message?.take(220) ?: "The AI request failed. Please retry." }
+            finally { watcher?.cancel(); if (generation == chatGeneration) { chatBusy.value = false; chatStatus.value = "" } }
         }
     }
     private fun action(block: suspend () -> Unit) = viewModelScope.launch {

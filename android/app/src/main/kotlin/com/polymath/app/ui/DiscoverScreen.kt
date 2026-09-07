@@ -115,6 +115,7 @@ import kotlin.math.abs
                     Eyebrow(if (dragging > threshold / 2) "SAVE" else if (dragging < -threshold / 2) "DISMISS" else "1 MIN")
                 }
                 Text(card.title, style = MaterialTheme.typography.headlineLarge)
+                SourceImages(card.images, compact = true)
                 Text(card.summary.ifBlank { "Open the source to read this update." }, style = MaterialTheme.typography.bodyLarge, color = Muted)
                 Spacer(Modifier.height(20.dp))
                 Surface(shape = CircleShape, color = CanvasColor) { Text(Topics.title(card.topicId), Modifier.padding(horizontal = 12.dp, vertical = 7.dp), color = Sage, style = MaterialTheme.typography.labelLarge) }
@@ -136,7 +137,7 @@ import kotlin.math.abs
 }
 
 fun ageLabel(card: Card, now: Long): String {
-    if (card.kind == ContentKind.KNOWLEDGE_PILL) return "Starter lesson"
+    if (card.kind == ContentKind.KNOWLEDGE_PILL) return if (card.datasetId == "public") "Starter lesson" else "Imported source"
     val time = card.publishedAt ?: return "Publication date unavailable"
     val hours = ((now - time).coerceAtLeast(0) / 3_600_000)
     return when { hours < 1 -> "Published recently"; hours < 24 -> "${hours}h ago"; else -> "${hours / 24}d ago" }

@@ -17,10 +17,17 @@ object Topics {
         Topic("science", "Science", .22f, .58f),
         Topic("math", "Mathematics", .64f, .70f),
         Topic("craft", "Craft of work", .84f, .53f),
+        Topic("history", "History", .13f, .82f),
+        Topic("philosophy", "Philosophy", .44f, .88f),
+        Topic("literature", "Literature & language", .80f, .88f),
+        Topic("economics", "Economics", .92f, .10f),
+        Topic("engineering", "Engineering", .09f, .38f),
+        Topic("certifications", "Professional certifications", .55f, .08f),
     )
     // Editorial relatedness, never an inferred prerequisite or a mastery claim.
     val related = listOf("systems" to "ai", "systems" to "design", "systems" to "science",
-        "systems" to "math", "systems" to "craft", "ai" to "math", "design" to "craft")
+        "systems" to "math", "systems" to "craft", "ai" to "math", "design" to "craft", "science" to "engineering", "craft" to "certifications",
+        "history" to "literature", "philosophy" to "history", "economics" to "math", "philosophy" to "systems")
     fun title(id: String) = all.firstOrNull { it.id == id }?.title ?: id
 }
 
@@ -40,14 +47,18 @@ data class Card(
     val correctAnswer: Int = -1,
     val explanation: String = "",
     val edition: Int = 1,
+    val images: List<SourceImage> = emptyList(),
+    val datasetId: String = "public",
 )
+
+data class SourceImage(val url: String, val alt: String = "Source illustration", val caption: String = "")
 
 data class Preference(val topicId: String, val followed: Boolean, val muted: Boolean = false)
 data class TrainingEvent(val id: String, val features: List<Double>, val judgment: Judgment)
 
 /** Tiny online logistic model. Replay from zero makes an undo exact, including later events. */
 object Recommender {
-    const val VERSION = 1
+    const val VERSION = 2
     val dimensions = Topics.all.size + 2
     fun features(card: Card): List<Double> = List(dimensions) { index ->
         when {
