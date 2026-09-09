@@ -1,4 +1,17 @@
-# Build status — Polymath 0.3.0 development
+# Build status — Polymath Offline 0.3.1
+
+The [public offline preview APK](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/download/v0.3.1-offline-preview/Polymath_0.3.1_offline_preview.apk) is built from `8dea1606f38df3a63d73dece09b80bc5ea12707f`. It includes the Qwen3-0.6B Q4_K_M weights and installs separately as **Polymath Offline** (`com.polymath.app.offline`, version code 4).
+
+- [Preview verification run 34343013163](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34343013163) passed: APK build, 53 unit/Robolectric tests with no failures/errors/skips, lint, and all 12 native-library alignment checks.
+- The actual Android UI test passed on API 35 x86_64 with 6 GB emulator RAM and airplane mode: first launch, prepare included model from APK assets, import/select example dataset, submit a question through chat and receive a cited answer. No inference endpoint or API key was configured.
+- [Publisher run 34344548170](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34344548170) passed, including an anonymous public download and APK/model checksum verification. The published file is the tested APK, not a rebuild.
+- APK size: 657,299,390 bytes. SHA-256: `bad63923c4486fb9eec45d2277071c615ab00b9c84fc6dff3e559758eae3bd30`.
+
+See [setup instructions](../docs/OFFLINE_PREVIEW.md) and the [machine-readable receipt](../docs/offline-preview-verification.json). Physical ARM64 performance, broad answer accuracy, production signing and actual 16 KB runtime qualification remain open.
+
+## Archived 0.3.0 development receipt
+
+The following describes the earlier APK without bundled model weights; its pending bundled-APK gate was completed for 0.3.1 above.
 
 Source commit `dce92f042a9363887af4d3e8734e9fd1c3988d96` passed [Android verification](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582170) and [real-model offline integration](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582133) on 9 September 2026.
 

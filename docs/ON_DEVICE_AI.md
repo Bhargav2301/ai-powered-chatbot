@@ -1,8 +1,8 @@
 # Polymath: on-device LLM architecture and integration guide
 
-**Decision date:** 9 September 2026. **Implementation:** Android 0.3.0 development.
+**Decision date:** 9 September 2026. **Implementation:** Android 0.3.1 development.
 
-**Verification:** 53 Android unit/Robolectric tests, two real-model Android airplane-mode tests, native Q4 smoke and 16 KB ELF/ZIP checks passed. Physical-device performance and the optional model-included APK still require qualification. See the [verification record](VERIFICATION.md).
+**Verification:** The 0.3.1 model-included APK passed 53 Android unit/Robolectric tests, lint, 12-library ELF/ZIP alignment checks and the complete first-setup-to-cited-answer UI flow in airplane mode. Its exact bytes are publicly downloadable and checksum verified. The earlier 0.3 integration also passed two real-model Android tests and a native Q4 smoke test. Physical-device performance still requires qualification. See the [offline testing guide](OFFLINE_PREVIEW.md) and [verification record](VERIFICATION.md).
 
 ## 1. Recommendation and scope
 
@@ -126,7 +126,7 @@ F16 KV is retained initially because cache quantization introduces another quali
 | Import approved GGUF through Android document picker | Yes | User transfers the exact approved pack; unknown models rejected |
 | APK including `assets/models/<approved GGUF>` | Yes, including first-run installation | Approximately 397 MB added to APK; model is copied to private storage for the descriptor/mmap path |
 
-Use the download/import option for ordinary testing. The optional bundled APK intentionally supports installations with no first-run internet access. Bundling is not a way to evade distribution-channel size limits; confirm the current channel's rules before store delivery and consider an install-time asset pack for a later Play distribution.
+Use the public model-included offline preview for the simplest testing setup. Ordinary developer APKs retain download/import support. The bundled APK supports installations with no first-run internet access. Confirm distribution-channel size limits before store delivery and consider an install-time asset pack for a later Play distribution.
 
 All installations write to a partial file, enforce the expected maximum size, stream SHA-256, sync the file and atomically rename it only after validation. A failed installation preserves the prior model. Cancellation holds the install mutex until the network reader has closed. Stored weights are in `noBackupFilesDir/models`; no model or signing key enters Git. Loading verifies the file again before handing it to the worker.
 
@@ -184,9 +184,9 @@ The `:core:local` module compiles C++17 and packages `libpolymath_llm.so`. llama
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-In Polymath, open **Desk → chat icon → Connection → On device**. Choose **Download Qwen** or **Import approved GGUF file**. Wait for verification, then add the example dataset and ask about the voltage in its circuit. Test again with airplane mode enabled. An empty scope should explain that it lacks evidence.
+In Polymath, open **Desk → chat icon → AI settings → Offline AI**. Choose **Prepare included AI** in the offline preview; a normal build without weights offers **Download Qwen** or **Import approved GGUF file**. Wait for verification, then add the example dataset and ask about the voltage in its circuit. Test again with airplane mode enabled. An empty scope should explain that it lacks evidence.
 
-Different development signing keys prevent an in-place upgrade. Do not uninstall an older build containing important notes without preserving that data; export/restore is still pending. The existing public 0.2 test release is a separate build and does not contain this local engine.
+Different development signing keys prevent an in-place upgrade. Do not uninstall an older build containing important notes without preserving that data; export/restore is still pending. The offline preview uses a separate application ID and launcher label, so it can coexist with older builds. Data is not migrated between the two apps.
 
 ### Step 5 — Optional APK with bundled weights
 
@@ -206,7 +206,9 @@ cd android
 ./gradlew.bat :app:assembleDebug -PpolymathModelAssets=C:/Polymath/model-assets --max-workers=2
 ```
 
-The supplied directory must contain `models/Qwen3-0.6B-Q4_K_M.gguf`. Gradle sets `noCompress` for GGUF files. In this APK, the local settings show **Install included model**, which copies and verifies the pack without network access. This is a genuine bundled-model path, not a link to an inference server.
+Add `-PpolymathOfflinePreview=true` to either build command to create the separate `com.polymath.app.offline` installation named **Polymath Offline**. The standard application ID is otherwise retained.
+
+The supplied directory must contain `models/Qwen3-0.6B-Q4_K_M.gguf`. Gradle sets `noCompress` for GGUF files. In this APK, the local settings show **Prepare included AI**, which copies and verifies the pack without network access. This is a genuine bundled-model path, not a link to an inference server.
 
 ### Step 6 — Run automated checks
 

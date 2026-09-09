@@ -1,4 +1,26 @@
-# Verification record — Polymath 0.3 development
+# Verification record — Polymath Offline 0.3.1
+
+## Model-included APK and complete offline UI: 9 September 2026
+
+Tested application source: `8dea1606f38df3a63d73dece09b80bc5ea12707f`. The [public 0.3.1 prerelease](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/tag/v0.3.1-offline-preview) contains that exact tested APK. Later publication/documentation commits do not change its application source. See [offline-preview-verification.json](offline-preview-verification.json).
+
+| Check | Observed result | Evidence |
+|---|---|---|
+| Audit of the previously linked 0.3 artifact | Runtime/setup code present; no bundled GGUF weights | [Published audit](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/download/v0.3.1-offline-preview/previous-apk-audit.json) |
+| Preview APK, tests and lint | Build and lint passed; 53 unit/Robolectric tests, no failures/errors/skips | [Preview run](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34343013163) |
+| Bundled model and packaging | Exact approved Q4 model SHA-256; stored uncompressed; 12 native libraries passed ELF/ZIP alignment checks | Same preview run |
+| Complete offline UI | One instrumentation test passed on API 35 x86_64, 6 GB emulator RAM, airplane mode | Same preview run |
+| Public download | Exact tested APK published; anonymous download and APK/model hashes verified | [Publisher run](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34344548170) |
+
+`OfflineSetupInstrumentedTest` uses the normal app UI to onboard, open offline settings, prepare Qwen from the APK's assets, import/select Polymath foundations, and ask about a 6 ohm resistor carrying 2 amps. It requires a supported answer containing **12**, source **S1** with its original title, no configured endpoint/key, and local mode enabled. The test does not inject weights into app storage with adb. The real ViewModel, resource gates, local retrieval, isolated service and JNI runtime all execute.
+
+Actual device captures: [included-model setup](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/download/v0.3.1-offline-preview/offline-setup.png) and [cited offline answer](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/download/v0.3.1-offline-preview/offline-answer.png). The [build artifact](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34343013163/artifacts/10100857067) includes detailed reports and additional evidence, subject to GitHub authentication/retention.
+
+This verifies the delivered setup path and one grounded answer. Physical ARM64 phones, low-memory device behavior, sustained thermal/battery performance, broad answer quality, actual 16 KB page-runtime compatibility and production signing remain unqualified. The existing 0.3 tests below separately exercised cancellation. Local retrieval is BM25, not on-device semantic embeddings.
+
+## Historical 0.3.0 verification
+
+The following records describe the earlier runtime-only APK. Its bundled-APK limitation is resolved by the 0.3.1 verification above.
 
 ## On-device integration: 9 September 2026
 

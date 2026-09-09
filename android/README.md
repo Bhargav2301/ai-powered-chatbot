@@ -1,6 +1,6 @@
-# Polymath Android — 0.3.0 development
+# Polymath Android — 0.3.1 development
 
-On-device Qwen setup, model selection, resource limits and optional APK-bundled weights are documented in the [local LLM integration guide](../docs/ON_DEVICE_AI.md). The public 0.2 test APK remains a separate older build.
+On-device Qwen setup, model selection, resource limits and optional APK-bundled weights are documented in the [local LLM integration guide](../docs/ON_DEVICE_AI.md). The public offline preview includes the Qwen model and installs as **Polymath Offline**, alongside the original app. See [testing instructions](../docs/OFFLINE_PREVIEW.md).
 
 Kotlin, Jetpack Compose and Material 3. Minimum Android 9 (API 28); compile/target API 36. JDK 17, Gradle 8.13, AGP 8.11.1, Kotlin 2.1.21 and Room 2.7.2 are pinned.
 
@@ -13,7 +13,7 @@ bash gradlew :app:assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Application ID: `com.polymath.app`; version code: `3`. Signing keys are excluded from Git. Fresh checkouts and CI use the standard locally generated Android debug key. An existing local `dev/debug.keystore` is supported for development continuity; do not publish it. The public 0.2 APK uses the CI debug key; a fresh checkout or another CI runner can produce a different certificate and may not update that installation. Use a separate private key for production signing.
+Application ID: `com.polymath.app` by default; `-PpolymathOfflinePreview=true` selects `com.polymath.app.offline` and the Polymath Offline launcher label; version code: `4`. Signing keys are excluded from Git. Fresh checkouts and CI use the standard locally generated Android debug key. An existing local `dev/debug.keystore` is supported for development continuity; do not publish it. The public 0.2 APK uses the CI debug key; a fresh checkout or another CI runner can produce a different certificate and may not update that installation. Use a separate private key for production signing.
 
 ## Modules
 
@@ -31,7 +31,7 @@ Application ID: `com.polymath.app`; version code: `3`. Signing keys are excluded
 3. Save a Thought, Research topic or Idea in Notebook. Idea plans are editable four-step templates that require acceptance before task completion.
 4. Practice recall for EXP; completed tasks require a reflection. Merely opening or saving a card earns no EXP.
 5. Open Vault for offline keyword search. Tap its chat icon, or the chat icon at the top of Desk.
-6. In Connection, select **On device** and install Qwen, or explicitly select **Private server** and configure the [service](../services/rag/README.md). Select My vault or a dataset, ask a question, and inspect citations.
+6. Open **AI settings → Offline AI** and prepare Qwen. The optional **Use a private server (advanced)** action exposes the [service](../services/rag/README.md) settings. Select My vault or a dataset, ask a question, and inspect citations.
 7. In Chat → Datasets, add the built-in example or import a [JSON dataset](../datasets/README.md). Source cards join Discover immediately. Selecting a dataset in Chat queries all its imported documents, even those not saved to My vault.
 8. Pin One pill or Quick capture from Desk on a compatible launcher.
 
@@ -65,6 +65,6 @@ The UI test runs the actual Hilt Activity and Room repositories under Robolectri
 
 ## Current limits
 
-The normal APK includes the local runtime but downloads/imports its Qwen weights separately; an optional build includes them. Local chat uses BM25 and Qwen; no embedding model is installed. Offline Vault search remains FTS4 keyword search, and semantic retrieval is available in explicit server mode. JSON imports are bounded to 150 sources, 300,000 text/title characters, 20,000 characters per source and six images per source. The app allows 20 imported datasets. Unsupported or oversized imports fail visibly; they are not silently truncated into an incomplete corpus.
+The normal APK includes the local runtime but downloads/imports its Qwen weights separately; the public offline preview includes them. Local chat uses BM25 and Qwen; no embedding model is installed. Offline Vault search remains FTS4 keyword search, and semantic retrieval is available in explicit server mode. JSON imports are bounded to 150 sources, 300,000 text/title characters, 20,000 characters per source and six images per source. The app allows 20 imported datasets. Unsupported or oversized imports fail visibly; they are not silently truncated into an incomplete corpus.
 
 RSS retains up to six HTTPS images per entry and bounded feed excerpts, not full article scraping. The topic graph has curated relationships rather than inferred prerequisites. Plans remain templates. Export/restore, autosave, full-text PDFs/OCR and production device profiling are pending. Uninstalling removes local notes and history.

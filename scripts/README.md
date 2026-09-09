@@ -5,6 +5,7 @@ Run from the repository root with Python 3.12.
 | Script | Purpose |
 |---|---|
 | `prepare_local_llm.py` | Prepare pinned Android native source; optionally download or bundle the approved Q4 model pack |
+| `inspect_apk.py APK --aapt PATH --require-bundled` | Verify offline preview identity, native engine and the exact included Qwen weights |
 | `verify_native_apk.py APK` | Verify native ELF and stored ZIP alignment for 16 KB pages |
 | `download_models.py --output models` | Download pinned official MiniLM INT8 ONNX, tokenizer and Qwen3-0.6B Q8_0 GGUF; verify the committed SHA-256 lock before installation |
 | `download_llama.py --output .tools/llama` | Download and verify the Linux x64 CPU llama.cpp b10834 runtime |

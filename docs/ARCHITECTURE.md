@@ -1,10 +1,10 @@
-# Polymath architecture — 0.3 development
+# Polymath architecture — 0.3.1 development
 
 ## Native client
 
 Compose screens observe a Hilt ViewModel and a Room-backed repository. Room is the canonical source of personal data. DataStore holds preferences and explicit AI consent; Android Keystore protects the separate service token. Coroutines keep network and database work away from input handling.
 
-The application remains usable offline for discovery from cached content, notes, keyword retrieval, practice, EXP and project templates. AI chat has explicit local and private-server modes. Local BM25 plus Qwen runs through a permissionless isolated native worker; the normal APK installs a separately verified model pack, with an optional bundled-weight build. See the [on-device architecture and build guide](ON_DEVICE_AI.md).
+The application remains usable offline for discovery from cached content, notes, keyword retrieval, practice, EXP and project templates. AI chat has explicit local and private-server modes. Local BM25 plus Qwen runs through a permissionless isolated native worker; the normal APK installs a separately verified model pack, and the public offline preview includes the weights. Its separate application ID avoids debug-signature collisions with existing installations. AI settings opens offline setup first; server fields require an explicit advanced action. See the [on-device architecture and build guide](ON_DEVICE_AI.md).
 
 ## Data relationships
 

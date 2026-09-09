@@ -53,4 +53,11 @@ See docs/ROADMAP.md for physical-device release gates, model quality/efficiency 
 - User reports HTTPS/API-key setup after installing the linked 0.3 ZIP. Exact device state is unknown; the source defaults to local mode but keeps a server-mode preference, combines both choices in a connection sheet, and the linked build omitted model weights.
 - Implemented explicit offline-first setup, visible 0.3.1 identity, primary bundled-model preparation, local mode selection after installation, and advanced-only server settings.
 - The offline preview uses `com.polymath.app.offline` and launcher label Polymath Offline so existing app data survives differing debug certificates.
-- Added an APK-content audit and a full UI integration test: first launch, prepare model from APK assets, import example through UI and require a cited answer in airplane mode with no configured service. Verification is pending on branch offline-apk-fix.
+- Added an APK-content audit and a full UI integration test: first launch, prepare model from APK assets, import example through UI and require a cited answer in airplane mode with no configured service.
+
+### Offline preview verified and published
+
+- Source `8dea1606f38df3a63d73dece09b80bc5ea12707f` passed preview run `34343013163`: 53 unit/Robolectric tests, lint, 12-library alignment checks and the complete offline UI test on API 35 x86_64 with 6 GB RAM. The prior APK audit confirmed no bundled weights.
+- Published `v0.3.1-offline-preview`, release `385449027`, with the exact tested APK, build info, checksum, previous APK audit and real UI screenshots. Publisher run `34344548170` passed, including anonymous public download plus APK/model checksum verification.
+- APK: 657,299,390 bytes; SHA-256 `bad63923c4486fb9eec45d2277071c615ab00b9c84fc6dff3e559758eae3bd30`. Includes the pinned 396,705,472-byte Qwen Q4 model.
+- Root/Android READMEs and setup/build/verification docs now identify the separate Polymath Offline app, Prepare included AI flow, no-key local setup, dataset scope and remaining physical-device gates. Existing app data and earlier releases are preserved.

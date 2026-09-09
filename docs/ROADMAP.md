@@ -1,6 +1,6 @@
-# Engineering roadmap after the 0.3 local-inference integration
+# Engineering roadmap after the 0.3.1 offline preview
 
-The 0.2 scope delivers native dataset-scoped RAG chat, open-source inference, domain expansion and source-associated images. The 0.3 source adds local Qwen inference, verified model packs and BM25 retrieval. Remaining qualification and extensions are below.
+The 0.2 scope delivers native dataset-scoped RAG chat, open-source inference, domain expansion and source-associated images. The 0.3 source adds local Qwen inference, verified model packs and BM25 retrieval. The 0.3.1 preview includes the model in the APK, makes offline setup explicit and passes the full Android setup-to-cited-answer UI test in airplane mode. The exact tested APK is publicly downloadable; see [verification](VERIFICATION.md). Remaining qualification and extensions are below.
 
 | Priority / slice | Work | Acceptance gate |
 |---|---|---|

@@ -1,0 +1,55 @@
+{
+  "application_id": "com.polymath.app.offline",
+  "version_code": 4,
+  "version_name": "0.3.1",
+  "apk_bytes": 657299390,
+  "apk_sha256": "bad63923c4486fb9eec45d2277071c615ab00b9c84fc6dff3e559758eae3bd30",
+  "native_abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "contains_local_setup_text": true,
+  "bundled_gguf_files": [
+    "assets/models/Qwen3-0.6B-Q4_K_M.gguf"
+  ],
+  "model_sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+  "source_commit": "8dea1606f38df3a63d73dece09b80bc5ea12707f",
+  "build_run": 34343013163,
+  "bundled_model": true,
+  "android_unit_tests": {
+    "tests": 53,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "offline_ui_test": {
+    "passed": true,
+    "api": 35,
+    "abi": "x86_64",
+    "emulator_ram_mb": 6144,
+    "airplane_mode": true,
+    "model_from_apk_assets": true,
+    "normal_chat_ui": true,
+    "api_key_configured": false
+  },
+  "date": "2026-09-09",
+  "artifact_id": 10100857067,
+  "artifact_sha256": "8b2211337cde8e5c7810cdf489a463e835729ce68ea3e70f6fe1566431b53924",
+  "aligned_native_libraries": 12,
+  "lint": "passed",
+  "publication": {
+    "release_id": 385449027,
+    "tag": "v0.3.1-offline-preview",
+    "publisher_run": 34344548170,
+    "anonymous_download_verified": true,
+    "apk_url": "https://github.com/Bhargav2301/polymath_ai_news_chat/releases/download/v0.3.1-offline-preview/Polymath_0.3.1_offline_preview.apk"
+  },
+  "not_qualified": [
+    "physical ARM64 latency, memory, battery and thermal behavior",
+    "broad answer accuracy and abstention",
+    "actual 16 KB runtime environment",
+    "production signing"
+  ]
+}
