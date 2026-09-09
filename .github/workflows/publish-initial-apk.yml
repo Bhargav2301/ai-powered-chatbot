@@ -1,0 +1,120 @@
+name: Publish initial test APK
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-initial-apk.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-initial-test-apk
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'Bhargav2301/polymath_ai_news_chat' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: v0.2.0-initial
+      BUILD_COMMIT: 9ad4081e9657e2449eb92378b47444612f32fc5b
+      BUILD_RUN: '34100208781'
+      ARTIFACT_ID: '10010341760'
+      ARTIFACT_SHA256: 1353b506076548dc0635723f9f805c2f3e71cb6a142cee9ab43667badc27829a
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check whether this fixed release is already published
+        id: release
+        run: |
+          gh api "repos/$GH_REPO/releases?per_page=100" > releases.json
+          python3 - <<'PY'
+          import json, os
+          matches = [r for r in json.load(open('releases.json')) if r['tag_name'] == os.environ['RELEASE_TAG']]
+          if matches:
+              release = matches[0]
+              assert not release['draft'], 'An incomplete draft exists; inspect it before retrying.'
+              names = {a['name'] for a in release['assets'] if a['state'] == 'uploaded'}
+              assert {'Polymath_0.2.0_debug.apk', 'SHA256SUMS', 'BUILD_INFO.json'} <= names
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('exists=' + str(bool(matches)).lower() + '\n')
+          PY
+      - name: Verify the successful build and unchanged application source
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          git diff --exit-code "$BUILD_COMMIT" "$GITHUB_SHA" -- android/ services/ datasets/
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN" > build-run.json
+          gh api "repos/$GH_REPO/actions/artifacts/$ARTIFACT_ID" > artifact.json
+          python3 - <<'PY'
+          import json, os
+          run = json.load(open('build-run.json'))
+          artifact = json.load(open('artifact.json'))
+          assert run['conclusion'] == 'success' and run['status'] == 'completed'
+          assert run['head_sha'] == os.environ['BUILD_COMMIT']
+          assert run['event'] == 'push' and run['head_branch'] == 'main'
+          assert run['repository']['full_name'] == os.environ['GH_REPO']
+          assert artifact['name'] == 'android-verification' and not artifact['expired']
+          assert artifact['workflow_run']['id'] == int(os.environ['BUILD_RUN'])
+          assert artifact['digest'] == 'sha256:' + os.environ['ARTIFACT_SHA256']
+          PY
+      - name: Extract the verified APK and record its checksum
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          gh api "repos/$GH_REPO/actions/artifacts/$ARTIFACT_ID/zip" > verified-build.zip
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, zipfile
+          archive = pathlib.Path('verified-build.zip')
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == os.environ['ARTIFACT_SHA256']
+          output = pathlib.Path('release-assets')
+          output.mkdir()
+          with zipfile.ZipFile(archive) as bundle:
+              matches = [n for n in bundle.namelist() if n.endswith('app/build/outputs/apk/debug/app-debug.apk')]
+              assert len(matches) == 1, matches
+              apk = output / 'Polymath_0.2.0_debug.apk'
+              apk.write_bytes(bundle.read(matches[0]))
+          assert zipfile.is_zipfile(apk)
+          checksum = hashlib.sha256(apk.read_bytes()).hexdigest()
+          (output / 'SHA256SUMS').write_text(f'{checksum}  {apk.name}\n')
+          (output / 'BUILD_INFO.json').write_text(json.dumps({
+              'version': '0.2.0', 'variant': 'debug', 'application_id': 'com.polymath.app',
+              'min_android': '9', 'source_commit': os.environ['BUILD_COMMIT'],
+              'build_run': int(os.environ['BUILD_RUN']), 'artifact_id': int(os.environ['ARTIFACT_ID']),
+              'sha256': checksum, 'size_bytes': apk.stat().st_size,
+              'signing': 'CI-generated debug key; different from previously shared local builds'
+          }, indent=2) + '\n')
+          print((output / 'BUILD_INFO.json').read_text())
+          PY
+      - name: Publish APK, checksum and build provenance as a prerelease
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          gh release create "$RELEASE_TAG" release-assets/* \
+            --target "$GITHUB_SHA" --title 'Polymath 0.2.0 — Initial Android test build' \
+            --notes-file docs/releases/v0.2.0-initial.md --prerelease --draft
+          gh release edit "$RELEASE_TAG" --draft=false
+      - name: Verify the public download
+        env:
+          GH_TOKEN: ''
+        run: |
+          curl --fail --location --retry 3 --max-time 120 \
+            "https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/Polymath_0.2.0_debug.apk" \
+            --output public-test.apk
+          curl --fail --location --retry 3 --max-time 30 \
+            "https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/SHA256SUMS" \
+            --output public-SHA256SUMS
+          python3 - <<'PY'
+          import hashlib, pathlib, zipfile
+          apk = pathlib.Path('public-test.apk')
+          assert zipfile.is_zipfile(apk)
+          assert hashlib.sha256(apk.read_bytes()).hexdigest() == pathlib.Path('public-SHA256SUMS').read_text().split()[0]
+          print(f'Anonymous public APK download verified: {apk.stat().st_size} bytes')
+          PY

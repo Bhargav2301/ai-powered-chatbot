@@ -12,3 +12,10 @@
 ## Remaining product work
 
 See docs/ROADMAP.md for physical-device release gates, on-device model packs, export/restore, PDF/OCR and AI plan drafting. No production deployment or device certification is claimed.
+
+## Public testing download — preparation (2026-09-09)
+
+- Confirmed the repository rename and successful run `34100208781`; Android artifact `10010341760` is available and not expired.
+- Added a fixed-version prerelease publisher, release notes, and checksum/build provenance generation. It checks the original commit, artifact digest and unchanged application source, and never overwrites published assets.
+- Verification: workflow YAML parsed; embedded Bash and Python syntax checks passed; `python3 scripts/validate_project.py` and `git diff --check` passed.
+- Pending: execute the publisher, verify the anonymous public download, and add its link to the README. The CI key differs from the earlier locally shared APK; installation guidance documents the data implications.
