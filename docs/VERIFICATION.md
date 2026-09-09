@@ -1,4 +1,29 @@
-# Verification record — Polymath 0.2
+# Verification record — Polymath 0.3 development
+
+## On-device integration: 9 September 2026
+
+Verified implementation commit: `dce92f042a9363887af4d3e8734e9fd1c3988d96`. Later documentation and ignore-rule changes do not change this tested application/runtime source. Machine-readable summary: [local-verification.json](local-verification.json).
+
+| Check | Observed result | Evidence |
+|---|---|---|
+| Android APK, unit/Robolectric tests and lint | Build passed; 53 tests, zero failures/errors/skips; lint zero errors and 32 advisories | [Verification run](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582170) |
+| Native packaging | All 12 packaged libraries passed 16 KB ELF and stored-ZIP alignment checks | Same verification run |
+| Native Q4 execution | Actual Qwen model returned `12 volts` and source ID `S1` through the shared C++ core | [Local inference run](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582133) |
+| Android offline inference | Two instrumentation tests passed on API 35 x86_64 with airplane mode set and Wi-Fi/mobile data disabled | Same local inference run |
+| Existing RAG service | 14 tests passed; two MiniLM-artifact-dependent tests explicitly skipped | Verification run |
+| Source/configuration | Dataset/media/asset/Markdown checks and Docker Compose configuration passed | Verification run |
+
+The Android test requires the exact 396,705,472-byte Q4 artifact and verifies its SHA-256; missing weights fail the test. It runs the real isolated service and JNI engine, checks that the worker has no INTERNET permission, requires a supported answer containing **12** and **[S1]**, then confirms the app repository remains usable. The second test cancels inference and requires cancellation to complete without terminating the foreground app. This is real model execution, not a mocked response.
+
+Initial verification found an isolated-UID path-reopening failure and a valid model response without citation IDs. The final source uses the runtime's borrowed FILE-pointer loader and clearer citation instructions. Output validation was retained; an empty or invalid citation list is not accepted as a supported answer.
+
+The [Android verification artifact](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582170/artifacts/10095846353) contains the 0.3 debug APK, test/lint reports and generated Compose screen captures. GitHub authentication and artifact-retention limits apply. The public `v0.2.0-initial` download remains the earlier server-based build.
+
+These checks establish integration and one supported-answer example. They do not establish general factual accuracy, ARM64 phone latency, sustained thermal/battery behavior, API 28/36 runtime coverage or actual 16 KB page-runtime compatibility. The default APK was built; the optional model-included APK route has not been end-to-end qualified. These remaining gates are specified in the [on-device architecture/build guide](ON_DEVICE_AI.md). Lint advisories concern widget API fallbacks, dependency-version suggestions and version-catalog usage; no baseline suppresses lint errors.
+
+## Historical verification — Polymath 0.2
+
+The following records describe the previous implementation and its original build environment.
 
 ## Real AI execution
 

@@ -34,3 +34,16 @@ See docs/ROADMAP.md for physical-device release gates, model quality/efficiency 
 - Native real-Q4 smoke passed in run `34327997083`. Initial Android APK compiled, but the airplane-mode integration found that reopening an app-private model path failed. Replaced that with the runtime's borrowed FILE-pointer API. Android lint also identified use of a restricted factory; replaced it with the public framework factory.
 - Final Android build/lint, real-model airplane-mode integration and 16 KB ELF/ZIP validation are pending the correction build. No physical-phone latency, thermal, battery or memory qualification is claimed.
 - Detailed decision record and Gradle/NDK instructions: `docs/ON_DEVICE_AI.md`. Published `v0.2.0-initial` remains the earlier server-based test build.
+
+### Android qualification follow-up
+
+- Commit `1a0be60ad2d1b4669bdfa41d2cf6a63c4a357d8d`: verification run `34329472498` passed with 53 Android unit/Robolectric tests, zero lint errors (32 advisories), 12 native libraries passing 16 KB ELF/ZIP checks and 14 service tests (2 explicit model-dependent skips).
+- In run `34329472546`, native Q4 inference passed. Android airplane-mode inference loaded and generated successfully through the granted descriptor; cancellation passed. The citation acceptance assertion failed because the model returned an empty citation list, which the client correctly treated as insufficient evidence.
+- Commit `dce92f042a9363887af4d3e8734e9fd1c3988d96` clarifies supported-answer citation IDs in the production prompt and preserves strict verification. The synthetic instrumentation fixture now includes original JSON in failure messages. Reverification is in progress.
+
+### Final local-inference verification
+
+- Tested source `dce92f042a9363887af4d3e8734e9fd1c3988d96`: run `34330582170` passed Android build, 53 tests, lint (0 errors/32 advisories), 12-library 16 KB ELF/ZIP checks and service checks (14 passed/2 explicit skips).
+- Run `34330582133` passed actual Q4 host generation and both Android airplane-mode tests, including supported source answer and cancellation with the foreground app intact.
+- Detailed evidence is recorded in docs/VERIFICATION.md, docs/local-verification.json and android/BUILD_STATUS.md. docs/ON_DEVICE_AI.md is the decision record, implementation plan and Gradle/NDK guide.
+- Physical ARM64 performance, actual 16 KB page runtime, broad grounded-answer quality and optional bundled-model APK qualification remain release gates. The public 0.2 APK was not replaced.

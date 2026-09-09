@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-09",
+  "source_commit": "dce92f042a9363887af4d3e8734e9fd1c3988d96",
+  "android": {
+    "run_id": 34330582170,
+    "job_id": 102397967663,
+    "build": "passed",
+    "tests": 53,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "lint_errors": 0,
+    "lint_advisories": 32,
+    "aligned_native_libraries": 12,
+    "artifact_id": 10095846353
+  },
+  "native": {
+    "run_id": 34330582133,
+    "job_id": 102397967334,
+    "model_manifest": "local-model-lock.json",
+    "answer": "12 volts",
+    "citation_ids": [
+      "S1"
+    ]
+  },
+  "android_offline": {
+    "run_id": 34330582133,
+    "job_id": 102397967159,
+    "api": 35,
+    "abi": "x86_64",
+    "airplane_mode": true,
+    "tests": 2,
+    "failures": 0,
+    "checks": [
+      "actual isolated JNI generation with source citation",
+      "cancellation preserves foreground application"
+    ]
+  },
+  "service": {
+    "run_id": 34330582170,
+    "passed": 14,
+    "skipped": 2,
+    "skip_reason": "MiniLM artifacts not installed in this CI job"
+  },
+  "not_qualified": [
+    "physical ARM64 latency, memory, battery and thermal behavior",
+    "broad answer accuracy and abstention",
+    "actual 16 KB runtime environment",
+    "optional model-included APK installation",
+    "production signing"
+  ]
+}

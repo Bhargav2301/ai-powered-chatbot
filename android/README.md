@@ -13,7 +13,7 @@ bash gradlew :app:assembleDebug
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Application ID: `com.polymath.app`; version code: `3`. Signing keys are excluded from Git. Fresh checkouts and CI use the standard locally generated Android debug key. An existing local `dev/debug.keystore` is supported for development continuity; do not publish it. The delivered APK retains its previous signature, but a fresh checkout’s APK will not necessarily update it. Use a separate private key for production signing.
+Application ID: `com.polymath.app`; version code: `3`. Signing keys are excluded from Git. Fresh checkouts and CI use the standard locally generated Android debug key. An existing local `dev/debug.keystore` is supported for development continuity; do not publish it. The public 0.2 APK uses the CI debug key; a fresh checkout or another CI runner can produce a different certificate and may not update that installation. Use a separate private key for production signing.
 
 ## Modules
 

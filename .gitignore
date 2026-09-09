@@ -2,6 +2,8 @@
 **/.gradle/
 **/.kotlin/
 **/build/
+**/.cxx/
+**/.externalNativeBuild/
 **/local.properties
 **/.idea/
 *.iml
@@ -22,5 +24,4 @@ models/
 
 .tools/
 /.native/
-*.gguf
 *.part

@@ -2,6 +2,8 @@
 
 **Decision date:** 9 September 2026. **Implementation:** Android 0.3.0 development.
 
+**Verification:** 53 Android unit/Robolectric tests, two real-model Android airplane-mode tests, native Q4 smoke and 16 KB ELF/ZIP checks passed. Physical-device performance and the optional model-included APK still require qualification. See the [verification record](VERIFICATION.md).
+
 ## 1. Recommendation and scope
 
 Use **Qwen3-0.6B, Q4_K_M GGUF, with a pinned llama.cpp CPU runtime** for the first on-device implementation. Install the model once through an explicit download, import the approved file, or include it in a specially built APK. After installation, local chat and retrieval require no network connection or API key.

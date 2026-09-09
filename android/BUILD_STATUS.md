@@ -1,4 +1,18 @@
-# Verified build status — 0.2.0
+# Build status — Polymath 0.3.0 development
+
+Source commit `dce92f042a9363887af4d3e8734e9fd1c3988d96` passed [Android verification](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582170) and [real-model offline integration](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582133) on 9 September 2026.
+
+- Debug APK built: `com.polymath.app`, version code 3, minimum API 28 and compile/target API 36.
+- 53 unit/Robolectric tests passed, with no failures or skips. Lint: zero errors, 32 advisories.
+- Two actual-Qwen instrumentation tests passed on an API 35 x86_64 emulator in airplane mode: cited source Q&A and cancellation without foreground-app termination.
+- All 12 packaged native libraries passed 16 KB ELF/ZIP alignment checks. This is not a 16 KB runtime-device test.
+- The standard APK includes the runtime; install the separately verified Q4 model pack before local inference. The optional model-included APK path is documented but has not been qualified end to end.
+
+[Build guide](../docs/ON_DEVICE_AI.md), [complete verification record](../docs/VERIFICATION.md), and [debug APK/report artifact](https://github.com/Bhargav2301/polymath_ai_news_chat/actions/runs/34330582170/artifacts/10095846353). Physical ARM64 devices, production signing, battery/thermal behavior and broad answer-quality qualification remain open.
+
+## Archived 0.2.0 build receipt
+
+The following is the earlier locally built 0.2 artifact, not the 0.3 CI APK or the separately signed public 0.2 download.
 
 | Check | Result |
 |---|---|

@@ -3,7 +3,7 @@
 - [On-device AI implementation and build guide](ON_DEVICE_AI.md): Qwen/Gemma evaluation, quantization, memory, isolated inference, model distribution, Gradle/NDK setup and acceptance gates.
 - [Local model lock](local-model-lock.json): exact Q4 artifact revision, length, checksum and native runtime commit.
 - [Architecture](ARCHITECTURE.md): data flows, RAG boundaries and media provenance.
-- [Verification](VERIFICATION.md): actual checks, test receipts and remaining device gates.
+- [Verification](VERIFICATION.md): actual checks, test receipts and remaining device gates; [local integration receipt](local-verification.json).
 - [Roadmap](ROADMAP.md): actionable follow-up work beyond the current development build.
 - [Migration](MIGRATION.md): preserved legacy branch, history and rollback procedure.
 - [Model lock](model-lock.json): pinned official model artifacts and SHA-256 hashes.
