@@ -1,7 +1,7 @@
 name: Polymath verification
 on:
   push:
-    branches: [main]
+    branches: [main, local-llm-integration]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -27,10 +27,13 @@ jobs:
         uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: '13114758'
-          packages: 'platform-tools platforms;android-36 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1'
           log-accepted-android-sdk-licenses: false
+      - name: Prepare pinned native source
+        working-directory: .
+        run: python3 scripts/prepare_local_llm.py
       - name: Build, test and lint
-        run: bash gradlew :app:assembleDebug :core:model:test :core:data:testDebugUnitTest :app:testDebugUnitTest :app:lintDebug --stacktrace
+        run: bash gradlew :app:assembleDebug :core:model:test :core:data:testDebugUnitTest :core:local:testDebugUnitTest :app:testDebugUnitTest :app:lintDebug --stacktrace --max-workers=2
       - uses: actions/upload-artifact@v4
         if: always()
         with:

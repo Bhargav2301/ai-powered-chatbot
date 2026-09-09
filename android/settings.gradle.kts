@@ -4,4 +4,4 @@ dependencyResolutionManagement {
     repositories { google(); mavenCentral() }
 }
 rootProject.name = "Polymath"
-include(":app", ":core:model", ":core:data")
+include(":app", ":core:model", ":core:data", ":core:local")

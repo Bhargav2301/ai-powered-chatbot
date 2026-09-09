@@ -1,6 +1,8 @@
 # Polymath migration specification
 Status: FINALIZED
 
+Approved extension (2026-09-09): implement optional on-device Qwen inference with a pinned 4-bit model, verified model installation, offline scoped retrieval and citations, process isolation, cancellation and resource limits. Preserve explicit opt-in server mode without automatic network fallback. Research Gemma/LiteRT-LM as a conditional fallback and document device acceptance gates and Gradle/NDK steps. Native/emulator checks establish integration; physical-device performance remains a separate release gate.
+
 Approved by the user on 2026-09-07. Replace the Rasa chatbot with the native Android Polymath project while preserving the full old tree and history on deprecated/chatbot-2026-09-07.
 
 Deliver real dataset-scoped AI chat using permissively licensed open-source models through an explicitly configured self-hosted service; retain local-first storage and offline features. Expand learning domains, retain source-associated images in imported facts and feed cards, migrate Room without data loss, update every README, test and push main without force.

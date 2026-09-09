@@ -8,6 +8,8 @@ import okhttp3.OkHttpClient
 import androidx.room.Room
 import androidx.work.*
 import com.polymath.data.*
+import com.polymath.local.ModelPackStore
+import com.polymath.local.LocalInference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,6 +43,8 @@ object AppModule {
     @Provides @Singleton fun settings(@ApplicationContext context: Context) = UserSettings(context)
     @Provides @Singleton fun secret(@ApplicationContext context: Context) = ServiceSecret(context)
     @Provides @Singleton fun rag() = RagClient(BuildConfig.DEBUG)
+    @Provides @Singleton fun modelPack(@ApplicationContext context: Context) = ModelPackStore(context)
+    @Provides @Singleton fun localInference(@ApplicationContext context: Context) = LocalInference(context)
     @Provides @Singleton fun news(repository: FolioRepository) = NewsFetcher(repository)
 }
 

@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.polymath.data.*
 import com.polymath.model.*
+import com.polymath.local.*
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -16,7 +20,15 @@ data class Notice(val message: String, val undoAction: String? = null)
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FolioViewModel @Inject constructor(val repository: FolioRepository, private val settings: UserSettings,
-    private val news: NewsFetcher, private val rag: RagClient, private val secret: ServiceSecret) : ViewModel() {
+    private val news: NewsFetcher, private val rag: RagClient, private val secret: ServiceSecret,
+    private val modelPack: ModelPackStore, private val localInference: LocalInference,
+    @ApplicationContext private val context: Context) : ViewModel() {
+    val modelInstalled = MutableStateFlow(false)
+    val modelBundled = MutableStateFlow(false)
+    val modelBusy = MutableStateFlow(false)
+    val modelProgress = MutableStateFlow(0f)
+    val modelMessage = MutableStateFlow<String?>(null)
+    private var modelJob: Job? = null
     val datasetMessage = MutableStateFlow<String?>(null)
     val connectionMessage = MutableStateFlow<String?>(null)
     val chatScope = MutableStateFlow("vault")
@@ -37,7 +49,32 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
         .mapLatest { repository.search(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    init { action { repository.initialize(); initialized.value = true } }
+    init {
+        action { repository.initialize(); initialized.value = true }
+        viewModelScope.launch { modelInstalled.value = withContext(Dispatchers.IO) { modelPack.installed() } }
+        viewModelScope.launch { modelBundled.value = withContext(Dispatchers.IO) { modelPack.bundled() } }
+    }
+    fun useLocalAi(enabled: Boolean) = action { cancelChat(); settings.localAi(enabled) }
+    fun installModel(uri: Uri? = null, bundled: Boolean = false) {
+        if (modelBusy.value) return
+        cancelChat(); modelBusy.value = true; modelProgress.value = 0f; modelMessage.value = null
+        modelJob = viewModelScope.launch {
+            try {
+                val progress: (Long) -> Unit = { modelProgress.value = it.toFloat() / QwenPack.bytes }
+                if (uri != null || bundled) modelPack.import(uri, progress) else modelPack.download(progress)
+                modelInstalled.value = true
+                modelMessage.value = "Qwen is installed. On-device chat now works without internet."
+            } catch (e: CancellationException) { modelMessage.value = "Model installation stopped. You can restart it."; throw e }
+              catch (e: Exception) { modelMessage.value = e.message?.take(220) ?: "Could not install the model." }
+            finally { modelBusy.value = false }
+        }
+    }
+    fun cancelModelInstall() { modelJob?.cancel() }
+    fun removeModel() = action {
+        if (modelBusy.value) return@action
+        cancelChat(); modelPack.remove(); modelInstalled.value = false
+        modelMessage.value = "Local model removed. Your notes and saved sources remain available."
+    }
     fun onboard(topics: Set<String>) = action { repository.preferences(topics); settings.finishOnboarding() }
     fun preference(topic: String, followed: Boolean, muted: Boolean) = action { repository.preference(topic, followed, muted) }
     fun judge(card: Card, judgment: Judgment) = action {
@@ -109,11 +146,13 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
             var watcher: Job? = null
             try {
                 val connection = settings.values.first()
-                require(connection.aiEnabled) { "Open Connection and configure your private AI service first." }
+                require(connection.localAi || connection.aiEnabled) { "Open Connection and configure your private AI service first." }
                 val snapshot = repository.snapshot()
                 val documents = RagCorpus.documents(snapshot, scope)
                 val previous = snapshot.chat.filter { it.scope == scope && it.role == "user" }.map { it.text }
-                val payload = RagCorpus.request(question, scope, documents, if (retry) previous.dropLast(1) else previous)
+                val history = if (retry) previous.dropLast(1) else previous
+                // Validate shared scope limits without constructing an outbound request in device mode.
+                require(question.trim().length in 1..2000) { "Ask a shorter question." }
                 if (!retry) repository.addMessage(ChatMessageEntity(FolioRepository.uuid(), scope, "user", question.trim(), createdAt = System.currentTimeMillis()))
                 // A source edit/removal invalidates in-flight context, not merely the next request.
                 val job = coroutineContext[Job]!!
@@ -125,10 +164,25 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
                         }
                     }
                 }
-                val reply = rag.answer(connection.aiEndpoint, withContext(Dispatchers.IO) { secret.read() }, payload, documents) { if (generation == chatGeneration) chatStatus.value = it }
+                val reply = if (connection.localAi) {
+                    chatStatus.value = "Finding matching passages on this device"
+                    LocalRag.answer(question, documents, history) { prompt ->
+                        withContext(Dispatchers.IO) { DevicePolicy.check(context) }
+                        chatStatus.value = "Checking the local model and preparing Qwen"
+                        modelPack.openVerified().use { model ->
+                            chatStatus.value = "Qwen is answering on this device"
+                            localInference.generate(model, prompt)
+                        }
+                    }
+                } else {
+                    val payload = RagCorpus.request(question, scope, documents, history)
+                    rag.answer(connection.aiEndpoint, withContext(Dispatchers.IO) { secret.read() }, payload, documents) { if (generation == chatGeneration) chatStatus.value = it }
+                }
                 require(RagCorpus.documents(repository.snapshot(), scope) == documents) { "Sources changed. Please retry." }
                 repository.addMessage(ChatMessageEntity(FolioRepository.uuid(), scope, "assistant", reply.text,
                     reply.citations, reply.status, System.currentTimeMillis()))
+            } catch (e: TimeoutCancellationException) {
+                if (generation == chatGeneration) chatError.value = "Local AI reached its time limit. Try a shorter question."
             } catch (e: CancellationException) { throw e }
               catch (e: Exception) { if (generation == chatGeneration) chatError.value = e.message?.take(220) ?: "The AI request failed. Please retry." }
             finally { watcher?.cancel(); if (generation == chatGeneration) { chatBusy.value = false; chatStatus.value = "" } }

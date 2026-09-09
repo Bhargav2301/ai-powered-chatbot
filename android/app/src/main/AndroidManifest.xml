@@ -2,6 +2,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application android:name=".PolymathApplication" android:label="@string/app_name"
+        android:appComponentFactory=".LocalProcessFactory" tools:replace="android:appComponentFactory"
         android:icon="@drawable/ic_polymath" android:roundIcon="@drawable/ic_polymath"
         android:theme="@style/Theme.Polymath" android:allowBackup="false"
         android:fullBackupContent="false" android:dataExtractionRules="@xml/data_extraction_rules"

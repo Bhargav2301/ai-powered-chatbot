@@ -12,11 +12,14 @@ android {
         applicationId = "com.polymath.app"
         minSdk = 28
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
+    // Optional distribution for installation without a network: directory must contain models/<approved file>.
+    providers.gradleProperty("polymathModelAssets").orNull?.let { sourceSets.getByName("main").assets.srcDir(it) }
+    androidResources { noCompress += "gguf" }
     if (rootProject.file("dev/debug.keystore").isFile) signingConfigs.getByName("debug") {
         storeFile = rootProject.file("dev/debug.keystore")
         storePassword = "android"
@@ -36,6 +39,7 @@ kotlin { jvmToolchain(17) }
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:data"))
+    implementation(project(":core:local"))
     implementation(libs.room.runtime)
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(platform(libs.compose.bom))

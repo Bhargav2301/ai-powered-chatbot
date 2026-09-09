@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <service android:name="com.polymath.local.LocalLlmService"
+            android:exported="false" android:isolatedProcess="true" android:process=":local_llm" />
+    </application>
+</manifest>

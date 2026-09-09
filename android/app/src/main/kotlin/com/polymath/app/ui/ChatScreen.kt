@@ -22,6 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.polymath.app.FolioViewModel
 import com.polymath.data.*
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +40,14 @@ import org.json.JSONArray
     val status by vm.chatStatus.collectAsStateWithLifecycle()
     val error by vm.chatError.collectAsStateWithLifecycle()
     val connectionMessage by vm.connectionMessage.collectAsStateWithLifecycle()
+    val modelInstalled by vm.modelInstalled.collectAsStateWithLifecycle()
+    val ready = if (state.settings.localAi) modelInstalled else state.settings.aiEnabled
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_STOP) vm.cancelChat() }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer); vm.cancelChat() }
+    }
     var question by rememberSaveable { mutableStateOf("") }
     var connection by rememberSaveable { mutableStateOf(false) }
     var datasets by rememberSaveable { mutableStateOf(false) }
@@ -57,10 +68,11 @@ import org.json.JSONArray
                     state.folio.datasets.forEach { dataset -> FilterChip(scope == dataset.id, { vm.selectScope(dataset.id) }, label = { Text(dataset.title) }) }
                     AssistChip({ datasets = true }, label = { Text("Datasets") }, leadingIcon = { Icon(Icons.Outlined.LibraryAdd, null) })
                 }
-                if (!state.settings.aiEnabled) TextButton({ connection = true }) { Text("Connect your private AI service to start") }
-                Text("Only this scope is sent. Source images load from their original hosts.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                if (!ready) TextButton({ connection = true }) { Text(if (state.settings.localAi) "Install Qwen for offline chat" else "Connect your private AI service to start") }
+                Text(if (state.settings.localAi) "On-device · matching passages and answers stay on this device."
+                    else "Private server · only this scope is sent. Source images load from their original hosts.", color = Muted, style = MaterialTheme.typography.bodySmall)
                 LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(vertical = 16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    items(messages, key = { it.id }) { message -> ChatBubble(message) }
+                    items(messages, key = { it.id }) { message -> ChatBubble(message, state.settings.localAi) }
                     if (messages.isEmpty()) item { EmptyPanel("Start with something you keep.", "Ask a question about your saved sources and notes, or import a dataset. Every generated answer includes passages you can inspect.") }
                 }
                 if (busy) {
@@ -72,20 +84,20 @@ import org.json.JSONArray
                 }
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error); TextButton({ vm.retryChat() }, enabled = !busy) { Text("Retry question") } }
                 Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(question, { question = it.take(2000) }, Modifier.weight(1f), label = { Text("Ask your selected sources") }, maxLines = 4, enabled = !busy)
-                    IconButton({ vm.sendChat(question); question = "" }, enabled = !busy && question.isNotBlank() && state.settings.aiEnabled,
-                        modifier = Modifier.padding(top = 8.dp)) { Icon(Icons.AutoMirrored.Outlined.Send, "Send question", tint = if (state.settings.aiEnabled) Sage else Muted) }
+                    OutlinedTextField(question, { question = it.take(if (state.settings.localAi) 800 else 2000) }, Modifier.weight(1f), label = { Text("Ask your selected sources") }, maxLines = 4, enabled = !busy)
+                    IconButton({ vm.sendChat(question); question = "" }, enabled = !busy && question.isNotBlank() && ready,
+                        modifier = Modifier.padding(top = 8.dp)) { Icon(Icons.AutoMirrored.Outlined.Send, "Send question", tint = if (ready) Sage else Muted) }
                 }
             }
         }
     }
-    if (connection) ConnectionDialog(state.settings, connectionMessage, close = { connection = false }, save = { endpoint, key, enabled ->
+    if (connection) ConnectionDialog(vm, state.settings, connectionMessage, close = { connection = false }, save = { endpoint, key, enabled ->
         vm.configureAi(endpoint, key, enabled)
     })
     if (datasets) DatasetDialog(vm, state.folio, close = { datasets = false })
 }
 
-@Composable private fun ChatBubble(message: ChatMessageEntity) {
+@Composable private fun ChatBubble(message: ChatMessageEntity, local: Boolean) {
     val uri = LocalUriHandler.current
     FolioPanel(Modifier.fillMaxWidth()) {
         Eyebrow(if (message.role == "user") "YOU" else if (message.status == "answered") "POLYMATH / QWEN · CHECK THE EVIDENCE" else "POLYMATH / EVIDENCE CHECK")
@@ -98,7 +110,7 @@ import org.json.JSONArray
                 OutlinedButton({ expanded = !expanded }, Modifier.fillMaxWidth()) { Text("[${citation.getString("id")}] ${citation.getString("title")}") }
                 if (expanded) {
                     Text(citation.getString("excerpt"), color = Muted)
-                    SourceImages(Converters().imageList(citation.optJSONArray("images")?.toString() ?: "[]"))
+                    if (!local) SourceImages(Converters().imageList(citation.optJSONArray("images")?.toString() ?: "[]"))
                     if (!citation.isNull("source_url")) TextButton({ runCatching { uri.openUri(citation.getString("source_url")) } }) { Text("Open original source") }
                 }
             }
@@ -107,13 +119,18 @@ import org.json.JSONArray
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun ConnectionDialog(settings: Settings, message: String?, close: () -> Unit, save: (String, String, Boolean) -> Unit) {
+@Composable private fun ConnectionDialog(vm: FolioViewModel, settings: Settings, message: String?, close: () -> Unit, save: (String, String, Boolean) -> Unit) {
     var endpoint by rememberSaveable { mutableStateOf(settings.aiEndpoint) }
     var key by remember { mutableStateOf("") }
     var consent by rememberSaveable { mutableStateOf(settings.aiEnabled) }
     ModalBottomSheet(close, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = CanvasColor) {
         Column(Modifier.fillMaxWidth().heightIn(max = 640.dp).imePadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Text("Private AI connection", style = MaterialTheme.typography.headlineMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(settings.localAi, { vm.useLocalAi(true) }, label = { Text("On device") })
+                FilterChip(!settings.localAi, { vm.useLocalAi(false) }, label = { Text("Private server") })
+            }
+            if (settings.localAi) LocalModelControls(vm) else {
             Text("Run the Polymath service on a computer or server you trust. It uses open-source MiniLM and Qwen models. Hosting and downloads are your responsibility.", color = Muted)
             OutlinedTextField(endpoint, { endpoint = it }, Modifier.fillMaxWidth(), label = { Text("HTTPS service origin") }, singleLine = true)
             OutlinedTextField(key, { key = it }, Modifier.fillMaxWidth(), label = { Text(if (settings.aiEnabled) "API key (blank keeps current)" else "Service API key") }, visualTransformation = PasswordVisualTransformation(), singleLine = true)
@@ -122,9 +139,35 @@ import org.json.JSONArray
             if (settings.aiEnabled) Text("Connected to ${settings.aiEndpoint}", color = Sage)
             message?.let { Text(it, color = Sage) }
             Button({ save(endpoint, key, consent); key = "" }, Modifier.fillMaxWidth(), enabled = consent || settings.aiEnabled) { Text(if (settings.aiEnabled && !consent) "Disconnect" else "Save connection") }
+            }
             TextButton(close) { Text("Done") }
         }
     }
+}
+
+@Composable private fun LocalModelControls(vm: FolioViewModel) {
+    val installed by vm.modelInstalled.collectAsStateWithLifecycle()
+    val bundled by vm.modelBundled.collectAsStateWithLifecycle()
+    val busy by vm.modelBusy.collectAsStateWithLifecycle()
+    val progress by vm.modelProgress.collectAsStateWithLifecycle()
+    val message by vm.modelMessage.collectAsStateWithLifecycle()
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) vm.installModel(uri) }
+    Text("Qwen3 · 0.6B · 4-bit", style = MaterialTheme.typography.titleLarge)
+    Text("Download once (397 MB), then ask your saved sources without internet. No API key or account. Local AI needs a 64-bit device with about 4 GB RAM or more and enough free memory.", color = Muted)
+    Text("Only the approved Qwen model file is accepted. Downloads contact Hugging Face; questions and source text stay on this device. Local matching uses words in your sources. News and original-source links still need internet.", color = Muted, style = MaterialTheme.typography.bodySmall)
+    if (busy) {
+        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
+        Text("Installing model · ${(progress * 100).toInt()}%")
+        TextButton({ vm.cancelModelInstall() }) { Text("Stop installation") }
+    } else if (installed) {
+        Text("Installed · ready for offline chat", color = Sage)
+        TextButton({ vm.removeModel() }) { Text("Remove model to free storage") }
+    } else {
+        Button({ vm.installModel() }, Modifier.fillMaxWidth()) { Text("Download Qwen · 397 MB") }
+        OutlinedButton({ picker.launch(arrayOf("*/*")) }, Modifier.fillMaxWidth()) { Text("Import approved GGUF file") }
+        if (bundled) TextButton({ vm.installModel(bundled = true) }) { Text("Install included model") }
+    }
+    message?.let { Text(it, color = Sage) }
 }
 
 @Composable private fun DatasetDialog(vm: FolioViewModel, snapshot: FolioSnapshot, close: () -> Unit) {

@@ -1,0 +1,15 @@
+{
+  "id": "qwen3-0.6b-q4_k_m",
+  "family": "qwen3",
+  "repository": "unsloth/Qwen3-0.6B-GGUF",
+  "revision": "50968a4468ef4233ed78cd7c3de230dd1d61a56b",
+  "file": "Qwen3-0.6B-Q4_K_M.gguf",
+  "bytes": 396705472,
+  "sha256": "ac2d97712095a558e31573f62f466a3f9d93990898b0ec79d7c974c1780d524a",
+  "license": "Apache-2.0",
+  "llama_commit": "992cb503cdacf691ef06c332d05243bc7807257b",
+  "llama_tag": "b10834",
+  "context_tokens": 2048,
+  "max_prompt_tokens": 1536,
+  "max_output_tokens": 256
+}

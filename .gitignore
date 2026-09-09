@@ -21,3 +21,6 @@ models/
 *.keystore
 
 .tools/
+/.native/
+*.gguf
+*.part

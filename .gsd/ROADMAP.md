@@ -1,5 +1,11 @@
 # Polymath execution roadmap
 
+## Local inference integration
+
+1. Pin Qwen3-0.6B Q4_K_M and llama.cpp; compare MLC, MediaPipe/LiteRT-LM and Gemma.
+2. Add a verified model pack, bounded offline retrieval, isolated native inference and explicit device/server selection.
+3. Verify build, retrieval, model integrity, JNI inference and lifecycle; publish implementation/build guide with physical-device gates.
+
 1. Preserve complete old repository on deprecated branch: complete.
 2. Implement private RAG service and Android chat, imports, images, domains and migrations: complete.
 3. Verify real models, API, persistence, UI rendering, build and lint: complete.

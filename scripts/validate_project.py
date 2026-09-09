@@ -22,7 +22,7 @@ for document in value["documents"]:
         assert 0 <= quiz["correct_answer"] < len(quiz["answers"])
 
 for file in ROOT.rglob("*.md"):
-    if any(part in {".git", "build", ".gradle", ".tools", ".venv"} for part in file.parts):
+    if any(part in {".git", ".native", "build", ".gradle", ".tools", ".venv"} for part in file.parts):
         continue
     for link in re.findall(r"\]\(([^)]+)\)", file.read_text()):
         if "://" in link or link.startswith("#") or "{" in link:
