@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <application android:name=".PolymathApplication" android:label="@string/app_name"
+    <application android:name=".PolymathApplication" android:label="@string/launcher_name"
         android:appComponentFactory=".LocalProcessFactory" tools:replace="android:appComponentFactory"
         android:icon="@drawable/ic_polymath" android:roundIcon="@drawable/ic_polymath"
         android:theme="@style/Theme.Polymath" android:allowBackup="false"

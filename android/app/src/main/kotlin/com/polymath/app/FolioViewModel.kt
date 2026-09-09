@@ -25,6 +25,7 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
     @ApplicationContext private val context: Context) : ViewModel() {
     val modelInstalled = MutableStateFlow(false)
     val modelBundled = MutableStateFlow(false)
+    val modelChecked = MutableStateFlow(false)
     val modelBusy = MutableStateFlow(false)
     val modelProgress = MutableStateFlow(0f)
     val modelMessage = MutableStateFlow<String?>(null)
@@ -51,8 +52,10 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
 
     init {
         action { repository.initialize(); initialized.value = true }
-        viewModelScope.launch { modelInstalled.value = withContext(Dispatchers.IO) { modelPack.installed() } }
-        viewModelScope.launch { modelBundled.value = withContext(Dispatchers.IO) { modelPack.bundled() } }
+        viewModelScope.launch {
+            val (installed, bundled) = withContext(Dispatchers.IO) { modelPack.installed() to modelPack.bundled() }
+            modelInstalled.value = installed; modelBundled.value = bundled; modelChecked.value = true
+        }
     }
     fun useLocalAi(enabled: Boolean) = action { cancelChat(); settings.localAi(enabled) }
     fun installModel(uri: Uri? = null, bundled: Boolean = false) {
@@ -62,6 +65,7 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
             try {
                 val progress: (Long) -> Unit = { modelProgress.value = it.toFloat() / QwenPack.bytes }
                 if (uri != null || bundled) modelPack.import(uri, progress) else modelPack.download(progress)
+                settings.localAi(true)
                 modelInstalled.value = true
                 modelMessage.value = "Qwen is installed. On-device chat now works without internet."
             } catch (e: CancellationException) { modelMessage.value = "Model installation stopped. You can restart it."; throw e }
@@ -114,6 +118,7 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
                 } else secret.save("")
             }
             settings.aiConnection(validated, enabled)
+            settings.localAi(!enabled)
             connectionMessage.value = if (enabled) "Connection saved. Return to chat to ask your sources." else "Disconnected; the stored service key was removed."
         } catch (e: CancellationException) { throw e }
           catch (e: Exception) { connectionMessage.value = e.message?.take(220) ?: "Could not save this connection. Please retry." }
@@ -146,7 +151,7 @@ class FolioViewModel @Inject constructor(val repository: FolioRepository, privat
             var watcher: Job? = null
             try {
                 val connection = settings.values.first()
-                require(connection.localAi || connection.aiEnabled) { "Open Connection and configure your private AI service first." }
+                require(connection.localAi || connection.aiEnabled) { "Open AI settings and choose offline AI, or explicitly configure a private server." }
                 val snapshot = repository.snapshot()
                 val documents = RagCorpus.documents(snapshot, scope)
                 val previous = snapshot.chat.filter { it.scope == scope && it.role == "user" }.map { it.text }

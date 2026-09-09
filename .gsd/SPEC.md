@@ -10,3 +10,5 @@ Deliver real dataset-scoped AI chat using permissively licensed open-source mode
 Acceptance: Android build and tests, server API and retrieval tests, real model smoke test, source image association and UI checks, migration evidence, ordinary descendant Git history.
 
 Approved extension (2026-09-09): use the renamed `Bhargav2301/polymath_ai_news_chat` repository and add a public initial-app APK download to the root README. Publish the existing verified CI APK as a versioned GitHub prerelease, include install/service/signing guidance, and verify anonymous download before linking it.
+
+Approved correction (2026-09-09): deliver a clearly identifiable offline preview APK that includes the pinned Qwen weights, gives local setup priority without HTTPS/API-key fields, retains explicit advanced server choice, and tests the actual first-use chat UI with the bundled model in airplane mode. Publish the exact verified APK as a versioned prerelease and update the README download. Use a separate preview application ID to preserve existing installations and their data across differing debug certificates.

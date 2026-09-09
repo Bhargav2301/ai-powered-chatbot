@@ -47,3 +47,10 @@ See docs/ROADMAP.md for physical-device release gates, model quality/efficiency 
 - Run `34330582133` passed actual Q4 host generation and both Android airplane-mode tests, including supported source answer and cancellation with the foreground app intact.
 - Detailed evidence is recorded in docs/VERIFICATION.md, docs/local-verification.json and android/BUILD_STATUS.md. docs/ON_DEVICE_AI.md is the decision record, implementation plan and Gradle/NDK guide.
 - Physical ARM64 performance, actual 16 KB page runtime, broad grounded-answer quality and optional bundled-model APK qualification remain release gates. The public 0.2 APK was not replaced.
+
+## Offline APK handoff correction
+
+- User reports HTTPS/API-key setup after installing the linked 0.3 ZIP. Exact device state is unknown; the source defaults to local mode but keeps a server-mode preference, combines both choices in a connection sheet, and the linked build omitted model weights.
+- Implemented explicit offline-first setup, visible 0.3.1 identity, primary bundled-model preparation, local mode selection after installation, and advanced-only server settings.
+- The offline preview uses `com.polymath.app.offline` and launcher label Polymath Offline so existing app data survives differing debug certificates.
+- Added an APK-content audit and a full UI integration test: first launch, prepare model from APK assets, import example through UI and require a cited answer in airplane mode with no configured service. Verification is pending on branch offline-apk-fix.

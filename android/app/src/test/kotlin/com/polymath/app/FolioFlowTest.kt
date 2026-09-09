@@ -52,8 +52,14 @@ class FolioFlowTest {
         screenshot("07-datasets")
         compose.onNodeWithText("Done").performClick()
         compose.onNodeWithText("Polymath foundations").performClick()
-        compose.onNodeWithText("Connection").performClick()
-        waitFor("Private AI connection")
+        // A retained server preference must not hide the offline setup path.
+        kotlinx.coroutines.runBlocking { com.polymath.data.UserSettings(compose.activity).localAi(false) }
+        waitFor("Switch to offline AI")
+        compose.onNodeWithText("AI settings").performClick()
+        waitFor("Offline AI")
+        compose.onNodeWithText("HTTPS service origin").assertDoesNotExist()
+        compose.onNodeWithText("Service API key").assertDoesNotExist()
+        compose.onNodeWithText("Qwen3 · 0.6B · 4-bit").assertExists()
         screenshot("08-connection")
         compose.onNodeWithText("Done").performClick()
         compose.onNodeWithContentDescription("Back to folio").performClick()

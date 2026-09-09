@@ -8,12 +8,14 @@ plugins {
 android {
     namespace = "com.polymath.app"
     compileSdk = 36
+    val offlinePreview = providers.gradleProperty("polymathOfflinePreview").orNull == "true"
     defaultConfig {
-        applicationId = "com.polymath.app"
+        applicationId = if (offlinePreview) "com.polymath.app.offline" else "com.polymath.app"
         minSdk = 28
         targetSdk = 36
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.3.1"
+        resValue("string", "launcher_name", if (offlinePreview) "Polymath Offline" else "Polymath")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures { compose = true; buildConfig = true }
