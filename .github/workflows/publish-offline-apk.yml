@@ -1,0 +1,142 @@
+name: Publish verified offline preview
+
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-offline-apk.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-offline-preview-apk
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'Bhargav2301/polymath_ai_news_chat' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_TAG: v0.3.1-offline-preview
+      BUILD_COMMIT: 8dea1606f38df3a63d73dece09b80bc5ea12707f
+      BUILD_RUN: '34343013163'
+      ARTIFACT_ID: '10100857067'
+      ARTIFACT_SHA256: 8b2211337cde8e5c7810cdf489a463e835729ce68ea3e70f6fe1566431b53924
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check whether this fixed release is already published
+        id: release
+        run: |
+          gh api "repos/$GH_REPO/releases?per_page=100" > releases.json
+          python3 - <<'PY'
+          import json, os
+          matches = [r for r in json.load(open('releases.json')) if r['tag_name'] == os.environ['RELEASE_TAG']]
+          if matches:
+              release = matches[0]
+              assert not release['draft'], 'An incomplete draft exists; inspect it before retrying.'
+              names = {a['name'] for a in release['assets'] if a['state'] == 'uploaded'}
+              assert {'Polymath_0.3.1_offline_preview.apk', 'SHA256SUMS', 'BUILD_INFO.json'} <= names
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('exists=' + str(bool(matches)).lower() + '\n')
+          PY
+      - name: Verify the successful build and unchanged application source
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          git diff --exit-code "$BUILD_COMMIT" "$GITHUB_SHA" -- android/ services/ datasets/
+          gh api "repos/$GH_REPO/actions/runs/$BUILD_RUN" > build-run.json
+          gh api "repos/$GH_REPO/actions/artifacts/$ARTIFACT_ID" > artifact.json
+          python3 - <<'PY'
+          import json, os
+          run = json.load(open('build-run.json'))
+          artifact = json.load(open('artifact.json'))
+          assert run['conclusion'] == 'success' and run['status'] == 'completed'
+          assert run['head_sha'] == os.environ['BUILD_COMMIT']
+          assert run['event'] == 'push' and run['head_branch'] == 'offline-apk-fix'
+          assert run['repository']['full_name'] == os.environ['GH_REPO']
+          assert artifact['name'] == 'offline-preview-verification' and not artifact['expired']
+          assert artifact['workflow_run']['id'] == int(os.environ['BUILD_RUN'])
+          assert artifact['digest'] == 'sha256:' + os.environ['ARTIFACT_SHA256']
+          PY
+      - name: Extract the verified APK and record its checksum
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          gh api "repos/$GH_REPO/actions/artifacts/$ARTIFACT_ID/zip" > verified-build.zip
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, shutil, zipfile
+          archive = pathlib.Path('verified-build.zip')
+          with archive.open('rb') as source:
+              assert hashlib.file_digest(source, 'sha256').hexdigest() == os.environ['ARTIFACT_SHA256']
+          output = pathlib.Path('release-assets')
+          output.mkdir()
+          files = {'Polymath_0.3.1_offline_preview.apk': 'release-assets/Polymath_0.3.1_offline_preview.apk',
+                   'BUILD_INFO.json': 'release-assets/BUILD_INFO.json',
+                   'SHA256SUMS': 'release-assets/SHA256SUMS',
+                   'offline-setup.png': 'release-assets/evidence/files/offline-ui-evidence/02-included-model.png',
+                   'offline-answer.png': 'release-assets/evidence/files/offline-ui-evidence/04-cited-offline-answer.png',
+                   'previous-apk-audit.json': 'release-assets/evidence/previous-apk-audit.json'}
+          with zipfile.ZipFile(archive) as bundle:
+              for name, path in files.items():
+                  assert path in bundle.namelist(), path
+                  with bundle.open(path) as src, (output / name).open('wb') as dst:
+                      shutil.copyfileobj(src, dst, 1024 * 1024)
+          info = json.loads((output / 'BUILD_INFO.json').read_text())
+          assert info['source_commit'] == os.environ['BUILD_COMMIT']
+          assert info['build_run'] == int(os.environ['BUILD_RUN'])
+          assert info['application_id'] == 'com.polymath.app.offline' and info['version_name'] == '0.3.1'
+          assert info['bundled_model'] and info['offline_ui_test']['passed']
+          assert info['offline_ui_test']['model_from_apk_assets'] and info['offline_ui_test']['normal_chat_ui']
+          assert not info['offline_ui_test']['api_key_configured']
+          apk = output / 'Polymath_0.3.1_offline_preview.apk'
+          with apk.open('rb') as source:
+              checksum = hashlib.file_digest(source, 'sha256').hexdigest()
+          assert checksum == info['apk_sha256'] == (output / 'SHA256SUMS').read_text().split()[0]
+          lock = json.loads(pathlib.Path('docs/local-model-lock.json').read_text())
+          with zipfile.ZipFile(apk) as bundle, bundle.open('assets/models/' + lock['file']) as source:
+              assert hashlib.file_digest(source, 'sha256').hexdigest() == lock['sha256']
+          print(json.dumps(info, indent=2))
+          PY
+      - name: Publish APK, checksum and build provenance as a prerelease
+        if: steps.release.outputs.exists != 'true'
+        run: |
+          gh release create "$RELEASE_TAG" release-assets/* \
+            --target "$GITHUB_SHA" --title 'Polymath Offline 0.3.1 — Qwen included' \
+            --notes-file docs/releases/v0.3.1-offline-preview.md --prerelease --draft
+          gh release edit "$RELEASE_TAG" --draft=false
+      - name: Verify the public download
+        env:
+          GH_TOKEN: ''
+        run: |
+          curl --fail --location --retry 3 --max-time 300 \
+            "https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/Polymath_0.3.1_offline_preview.apk" \
+            --output public-test.apk
+          curl --fail --location --retry 3 --max-time 30 \
+            "https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/SHA256SUMS" \
+            --output public-SHA256SUMS
+          curl --fail --location --retry 3 --max-time 30 \
+            "https://github.com/$GH_REPO/releases/download/$RELEASE_TAG/BUILD_INFO.json" \
+            --output public-BUILD_INFO.json
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, zipfile
+          info = json.loads(pathlib.Path('public-BUILD_INFO.json').read_text())
+          assert info['source_commit'] == os.environ['BUILD_COMMIT']
+          assert info['build_run'] == int(os.environ['BUILD_RUN'])
+          assert info['application_id'] == 'com.polymath.app.offline' and info['offline_ui_test']['passed']
+          apk = pathlib.Path('public-test.apk')
+          assert zipfile.is_zipfile(apk)
+          with apk.open('rb') as source:
+              assert hashlib.file_digest(source, 'sha256').hexdigest() == info['apk_sha256'] == pathlib.Path('public-SHA256SUMS').read_text().split()[0]
+          lock = json.loads(pathlib.Path('docs/local-model-lock.json').read_text())
+          with zipfile.ZipFile(apk) as bundle, bundle.open('assets/models/' + lock['file']) as source:
+              assert hashlib.file_digest(source, 'sha256').hexdigest() == lock['sha256']
+          print(f'Anonymous public APK download verified: {apk.stat().st_size} bytes')
+          PY
