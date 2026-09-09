@@ -28,8 +28,7 @@ std::string polymath_generate(const std::string & path, const std::string & prom
     auto deadline = deadline_value;
     auto mp = llama_model_default_params();
     mp.n_gpu_layers = 0;
-    mp.use_mmap = true;
-    mp.use_mlock = false;
+    mp.load_mode = LLAMA_LOAD_MODE_MMAP;
     mp.progress_callback = loading;
     mp.progress_callback_user_data = &deadline;
     using Model = std::unique_ptr<llama_model, decltype(&llama_model_free)>;
