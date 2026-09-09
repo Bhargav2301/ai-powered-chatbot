@@ -21,10 +21,12 @@ class LocalInferenceInstrumentedTest {
         VerifiedModelFile.verify(file, QwenPack.bytes, QwenPack.sha256)
         val document = RagDocument("circuit", "test", 1, "Ohm's law", "A resistor carries 2 amps through 6 ohms. Ohm's law gives voltage = current times resistance, so the voltage is 12 volts.", null, emptyList())
         val inference = LocalInference(context)
+        var raw = ""
         val reply = LocalRag.answer("What voltage is needed for 2 amps through 6 ohms?", listOf(document), emptyList()) { prompt ->
-            ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { inference.generate(it, prompt) }
+            ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { inference.generate(it, prompt) }.also { raw = it }
         }
-        assertEquals("answered", reply.status)
+        // Synthetic fixture only: include the original model output when this integration fails.
+        assertEquals("Actual model JSON: $raw", "answered", reply.status)
         assertTrue(reply.text.contains("12"))
         assertTrue(reply.text.contains("[S1]"))
         // Unbind kills only the worker; Room and the foreground app remain available.
