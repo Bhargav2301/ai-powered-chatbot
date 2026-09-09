@@ -20,7 +20,7 @@ ws ::= [ \t\n\r]*
 )GBNF";
 }
 
-std::string polymath_generate(const std::string & path, const std::string & prompt, int threads) {
+std::string polymath_generate(FILE * file, const std::string & prompt, int threads) {
     if (prompt.empty() || prompt.size() > 24000) throw std::runtime_error("Local prompt exceeds its byte budget.");
     llama_log_set(quiet_log, nullptr);
     llama_backend_init();
@@ -32,7 +32,7 @@ std::string polymath_generate(const std::string & path, const std::string & prom
     mp.progress_callback = loading;
     mp.progress_callback_user_data = &deadline;
     using Model = std::unique_ptr<llama_model, decltype(&llama_model_free)>;
-    Model model(llama_model_load_from_file(path.c_str(), mp), llama_model_free);
+    Model model(llama_model_load_from_file_ptr(file, mp), llama_model_free);
     if (!model) throw std::runtime_error("Could not load the local model. Check free memory and the model pack.");
     const auto * vocab = llama_model_get_vocab(model.get());
     const int n = -llama_tokenize(vocab, prompt.data(), static_cast<int>(prompt.size()), nullptr, 0, true, true);

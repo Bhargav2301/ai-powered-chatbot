@@ -1,10 +1,10 @@
-# Polymath architecture — 0.2
+# Polymath architecture — 0.3 development
 
 ## Native client
 
 Compose screens observe a Hilt ViewModel and a Room-backed repository. Room is the canonical source of personal data. DataStore holds preferences and explicit AI consent; Android Keystore protects the separate service token. Coroutines keep network and database work away from input handling.
 
-The application remains usable offline for discovery from cached content, notes, keyword retrieval, practice, EXP and project templates. AI chat uses the optional self-hosted service. No model weights are included in the APK.
+The application remains usable offline for discovery from cached content, notes, keyword retrieval, practice, EXP and project templates. AI chat has explicit local and private-server modes. Local BM25 plus Qwen runs through a permissionless isolated native worker; the normal APK installs a separately verified model pack, with an optional bundled-weight build. See the [on-device architecture and build guide](ON_DEVICE_AI.md).
 
 ## Data relationships
 
@@ -29,7 +29,7 @@ Chat messages are keyed by selected scope. Citation payloads record source ID, r
 
 The v1 → v2 migration adds content images/dataset ID and dataset/chat tables. Original topic order is retained. A v1 training feature vector is projected into the expanded v2 feature space before replay, preserving the old six topic contributions, content-type coefficient and bias.
 
-## RAG path
+## Private-server RAG path
 
 ```mermaid
 flowchart TD
@@ -58,4 +58,4 @@ Card faces display the first image; readers display all retained images, caption
 
 The RAG HTTP interface streams status and a final NDJSON answer after verification. It is not token streaming. The backend computes exact semantic search at request time; local Vault keyword search remains available immediately without a server. Corpus and chunk limits avoid silently dropping source tails. Very large vaults must use smaller imported dataset scopes until incremental local semantic indexing is implemented.
 
-There are no measured phone latency/thermal guarantees yet. The real CPU model smoke receipt is an integration check, not a broad performance benchmark. See the roadmap for on-device embeddings, generation packs and corpus scaling.
+There are no measured phone latency/thermal guarantees yet. The real CPU model smoke receipt is an integration check, not a broad performance benchmark. See the roadmap for on-device embeddings, physical-device qualification and corpus scaling.

@@ -34,6 +34,21 @@ jobs:
         run: python3 scripts/prepare_local_llm.py
       - name: Build, test and lint
         run: bash gradlew :app:assembleDebug :core:model:test :core:data:testDebugUnitTest :core:local:testDebugUnitTest :app:testDebugUnitTest :app:lintDebug --stacktrace --max-workers=2
+      - name: Verify native APK alignment
+        working-directory: .
+        run: python3 scripts/verify_native_apk.py android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Print validation receipt
+        if: always()
+        run: |
+          if [ -f app/build/reports/lint-results-debug.txt ]; then cat app/build/reports/lint-results-debug.txt; fi
+          python3 - <<'PY'
+          import pathlib, xml.etree.ElementTree as ET
+          totals = dict(tests=0, failures=0, errors=0, skipped=0)
+          for report in pathlib.Path('.').glob('**/build/test-results/**/TEST-*.xml'):
+              suite = ET.parse(report).getroot()
+              for name in totals: totals[name] += int(suite.attrib.get(name, 0))
+          print('Android unit test totals:', totals)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:

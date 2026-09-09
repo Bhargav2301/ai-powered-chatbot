@@ -45,9 +45,10 @@ class LocalLlmService : Service() {
     }
     override fun onBind(intent: Intent): IBinder = messenger.binder
     override fun onUnbind(intent: Intent): Boolean { terminate(); return false }
-    override fun onLowMemory() { terminate() }
+    override fun onLowMemory() { super.onLowMemory(); terminate() }
     @Deprecated("Framework callback")
     override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
         if (level == TRIM_MEMORY_RUNNING_LOW || level == TRIM_MEMORY_RUNNING_CRITICAL || level >= TRIM_MEMORY_COMPLETE) terminate()
     }
     private fun terminate() {

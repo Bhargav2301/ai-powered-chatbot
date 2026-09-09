@@ -1,0 +1,14 @@
+Polymath local AI runtime
+
+llama.cpp: https://github.com/ggml-org/llama.cpp
+Pinned commit: 992cb503cdacf691ef06c332d05243bc7807257b
+License: MIT (see llama-cpp-LICENSE.txt).
+
+Model: Qwen3-0.6B, converted to Q4_K_M GGUF by Unsloth.
+Original model: https://huggingface.co/Qwen/Qwen3-0.6B
+Converted model: https://huggingface.co/unsloth/Qwen3-0.6B-GGUF
+Revision: 50968a4468ef4233ed78cd7c3de230dd1d61a56b
+Model license: Apache License 2.0.
+The quantization changes numerical weight representation. Polymath does not claim authorship of the original model or Unsloth conversion.
+
+Model weights are installed separately in the standard build, or included in a custom bundled-model build.
