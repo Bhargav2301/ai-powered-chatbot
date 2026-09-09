@@ -4,9 +4,22 @@ Native Android learning and knowledge management, with optional private AI chat.
 
 **Current release: 0.2.0 (development).** The Android app is Kotlin/Jetpack Compose. AI uses a self-hosted, open-source **MiniLM + Qwen** service. Reading, notes, keyword search, recommendations and EXP work without the service. There is no proprietary-model fallback or mandatory account.
 
+## Download and test the Android app
+
+**[Download Polymath 0.2.0 APK](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/download/v0.2.0-initial/Polymath_0.2.0_debug.apk)** — initial test build for **Android 9 or newer**. No GitHub account is needed to download it.
+
+[Release notes and checksums](https://github.com/Bhargav2301/polymath_ai_news_chat/releases/tag/v0.2.0-initial)
+
+1. Download the APK on your Android device and open it. If prompted, allow installation from the browser or file manager used for the download; you can turn that permission off afterward.
+2. Open Polymath, choose your topics, swipe and save a card, write a note, and explore the Vault and learning graph. These features need no account or AI setup.
+3. To test AI chat, follow [Enable AI chat](#enable-ai-chat) below. The app requires your self-hosted service; no hosted AI endpoint or API key is included.
+4. [Report bugs or share feedback](https://github.com/Bhargav2301/polymath_ai_news_chat/issues) with your device, Android version, and steps to reproduce.
+
+This is an early **debug build**, not a production release. It uses the CI signing key, so it may not install over an earlier privately shared APK or one built on another computer. Uninstalling deletes local notes and saved data; preserve anything important before choosing a fresh installation. Export/restore is not available yet.
+
 ## Repository migration
 
-The previous Rasa music/movie chatbot is preserved on [deprecated/chatbot-2026-09-07](https://github.com/Bhargav2301/ai-powered-chatbot/tree/deprecated/chatbot-2026-09-07). Its original commit is `cf66c820319cc07679c075fa189f5e8de837dd19`; the archive adds only `DEPRECATED.md`. All original tracked files and Git history remain available. Main now contains Polymath; this migration does not rewrite history.
+The previous Rasa music/movie chatbot is preserved on [deprecated/chatbot-2026-09-07](https://github.com/Bhargav2301/polymath_ai_news_chat/tree/deprecated/chatbot-2026-09-07). Its original commit is `cf66c820319cc07679c075fa189f5e8de837dd19`; the archive adds only `DEPRECATED.md`. All original tracked files and Git history remain available. Main now contains Polymath; this migration does not rewrite history.
 
 | Location | Responsibility |
 |---|---|
@@ -37,7 +50,7 @@ cd android
 bash gradlew :app:assembleDebug
 ```
 
-Install `android/app/build/outputs/apk/debug/app-debug.apk` on Android 9+. The APK delivered with this migration uses the retained local development key and can update the previous 0.1 build. Fresh checkouts and CI generate their own debug key; signing material is excluded from Git. No build here is signed for a production store release.
+Install `android/app/build/outputs/apk/debug/app-debug.apk` on Android 9+. Fresh checkouts and CI generate their own debug key; signing material is excluded from Git. Locally built APKs may have a different signature from the [public test APK](#download-and-test-the-android-app). No build here is signed for a production store release.
 
 ## Enable AI chat
 

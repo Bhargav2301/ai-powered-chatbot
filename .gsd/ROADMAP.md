@@ -9,5 +9,5 @@ Future engineering slices and acceptance gates are tracked in docs/ROADMAP.md.
 
 ## Public testing download (2026-09-09)
 
-1. Publish the existing successful CI APK with a checksum and build provenance; verify anonymous download.
-2. Add the verified release link, Android installation steps and test guidance to the root README; update its renamed repository URL.
+1. Publish the existing successful CI APK with a checksum and build provenance; verify anonymous download: complete.
+2. Add the verified release link, Android installation steps and test guidance to the root README; update its renamed repository URL: complete.

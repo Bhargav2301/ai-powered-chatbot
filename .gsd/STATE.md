@@ -19,3 +19,10 @@ See docs/ROADMAP.md for physical-device release gates, on-device model packs, ex
 - Added a fixed-version prerelease publisher, release notes, and checksum/build provenance generation. It checks the original commit, artifact digest and unchanged application source, and never overwrites published assets.
 - Verification: workflow YAML parsed; embedded Bash and Python syntax checks passed; `python3 scripts/validate_project.py` and `git diff --check` passed.
 - Pending: execute the publisher, verify the anonymous public download, and add its link to the README. The CI key differs from the earlier locally shared APK; installation guidance documents the data implications.
+
+## Public testing download — verified (2026-09-09)
+
+- Published prerelease `v0.2.0-initial` (release ID `385299452`) with `Polymath_0.2.0_debug.apk`, `SHA256SUMS` and `BUILD_INFO.json`.
+- Publisher run `34323245072` passed, including anonymous download and checksum verification. APK: 67,290,631 bytes; SHA-256 `bce40f2aa38058ae02d5d10c04dde9016a85b9e964538098428ff4c70731027e`.
+- Added the verified public download near the top of the root README, installation steps, service setup and feedback links, and CI-signature/data-loss guidance. Root README repository links use the renamed repository.
+- `python3 scripts/validate_project.py` and `git diff --check` passed. Application source and the previously verified CI APK were unchanged.
